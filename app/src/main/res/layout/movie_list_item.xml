@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Using two views instead of compound view to allow for image scaling control -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    tools:ignore="UseCompoundDrawables">
+    <ImageView
+        android:id="@+id/iv_poster"
+        android:contentDescription="@string/movie_poster_desc"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_gravity="center_horizontal" />
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal" />
+
+</LinearLayout>

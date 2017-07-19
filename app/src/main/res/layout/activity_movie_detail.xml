@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="16dp"
+    tools:context="com.craigcleveland.popularmovies.MovieDetailActivity">
+
+    <ImageView
+        android:id="@+id/iv_poster"
+        android:contentDescription="@string/movie_poster_desc"
+        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/tv_detail_title"
+        android:text="@string/movie_title"
+        android:textSize="36sp"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:stretchColumns="0,1">
+        <TableRow>
+            <TextView
+                android:text="@string/user_rating"
+                android:layout_gravity="end"
+                android:textStyle="bold"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
+            <TextView
+                android:id="@+id/tv_detail_user_rating" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="@string/release_date"
+                android:layout_gravity="end"
+                android:textStyle="bold"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"/>
+            <TextView
+                android:id="@+id/tv_detail_release_date" />
+        </TableRow>
+    </TableLayout>
+    <View
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorPrimary" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="@string/synopsis"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tv_detail_synopsis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+
+</LinearLayout>

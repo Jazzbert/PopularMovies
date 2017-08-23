@@ -1,16 +1,19 @@
 package com.craigcleveland.popularmovies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.craigcleveland.popularmovies.utilities.MovieDBJsonUtils;
@@ -46,18 +49,6 @@ public class MainActivity extends AppCompatActivity
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
-        Spinner sortOrderSpinner;
-        sortOrderSpinner = (Spinner) findViewById(R.id.spinner_sort_order);
-
-        /* Populate Spinner values */
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.sort_order_array, R.layout.spinner_text);
-        spinnerAdapter.setDropDownViewResource(R.layout.spinner_text);
-        sortOrderSpinner.setAdapter(spinnerAdapter);
-        sortOrderSpinner.setSelection(MOST_POPULAR);
-        sortOrderSpinner.setOnItemSelectedListener(this);
-
-
         /* Using LinearLayoutManager to support different options later */
         GridLayoutManager layoutManger =
                 new GridLayoutManager(this, 2);
@@ -73,16 +64,39 @@ public class MainActivity extends AppCompatActivity
 
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        loadMovieData(sortOrderSpinner.getSelectedItemPosition());
+        loadMovieData();
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.movies_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mi_about:
+                return true;
+            case R.id.mi_settings:
+                Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+                startActivity(startSettingsActivity);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+
+        }
+    }
+
     /*
-     * This method re-loads movie data based on change in sort-type spinner.  It is
-     * required by AdapterView.OnItemSelectedListener.
-     */
+             * This method re-loads movie data based on change in sort-type spinner.  It is
+             * required by AdapterView.OnItemSelectedListener.
+             */
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        loadMovieData(pos);
+        loadMovieData();
     }
 
     /*
@@ -94,9 +108,14 @@ public class MainActivity extends AppCompatActivity
 
     /*
      * This method shows gets URL for the movie list query and starts the async task to
-     * fetch the data and populate the adapater.
+     * fetch the data and populate the adapter.
      */
-    private void loadMovieData(int sortType) {
+    private void loadMovieData() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String sort_key = getString(R.string.pref_sort_order_key);
+        String sort_default = getString(R.string.pref_sort_order_default);
+        int sortType = Integer.parseInt(sharedPreferences.getString(sort_key, sort_default));
+
         showMovieDataView();
 
         URL fetchURL = NetworkUtils.buildUrl(sortType, getString(R.string.tmdbAPIKey));

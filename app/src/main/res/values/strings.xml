@@ -22,4 +22,12 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+
+    <!-- Strings for About Activity -->
+    <string name="app_created_by">App created by</string>
+    <string name="craig_cleveland">Craig Cleveland</string>
+    <string name="app_purpose">PopularMovies was completed as a project\n for Udacity Android Nanodegree</string>
+    <string name="tmdb_credit">Content for this application is\n provided by TheMovieDB.com</string>
+    <string name="creator_email">craig.cleveland@gmail.com</string>
+
 </resources>

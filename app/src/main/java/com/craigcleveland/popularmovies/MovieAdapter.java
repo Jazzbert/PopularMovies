@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.craigcleveland.popularmovies.utilities.MovieDBJsonUtils;
 import com.craigcleveland.popularmovies.utilities.NetworkUtils;
@@ -31,12 +30,10 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
             implements View.OnClickListener {
 
         public final ImageView mPosterImageView;
-        public final TextView mMovieTitleTextView;
 
         public MovieAdapterViewHolder(View view) {
             super(view);
             mPosterImageView = view.findViewById(R.id.iv_poster);
-            mMovieTitleTextView = view.findViewById(R.id.tv_title);
             view.setOnClickListener(this);
         }
 
@@ -60,7 +57,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
         String movieTitle = mMovieData[position][MovieDBJsonUtils.TITLE_ITEM];
-        movieAdapterViewHolder.mMovieTitleTextView.setText(movieTitle);
+        movieAdapterViewHolder.mPosterImageView.setContentDescription(movieTitle);
 
         String posterURL =
                 NetworkUtils.buildPosterURL(mMovieData[position][MovieDBJsonUtils.POSTER_ITEM]);

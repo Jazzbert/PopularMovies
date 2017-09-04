@@ -1,6 +1,8 @@
 package com.craigcleveland.popularmovies;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,15 +15,19 @@ import com.squareup.picasso.Picasso;
 
 class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
-    private String[][] mMovieData;
+    private final String TAG = MovieAdapter.class.getSimpleName();
 
     private final MovieAdapterClickHandler mClickHandler;
 
+    private final Context mContext;
+    private Cursor mCursor;
+
     public interface MovieAdapterClickHandler {
-        void onClick(String movieDetails[]);
+        void onClick(int movieID);
     }
 
-    public MovieAdapter(MovieAdapterClickHandler clickHandler) {
+    public MovieAdapter(@NonNull Context context, MovieAdapterClickHandler clickHandler) {
+        mContext = context;
         mClickHandler = clickHandler;
     }
 
@@ -40,39 +46,45 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            mClickHandler.onClick(mMovieData[adapterPosition]);
+            mClickHandler.onClick(mCursor.getInt(MainActivity.INDEX_MOVIE_ID));
         }
     }
 
     @Override
     public MovieAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        Context context = viewGroup.getContext();
+
         int layoutForListItem = R.layout.movie_list_item;
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
 
         View view = inflater.inflate(layoutForListItem, viewGroup, false);
+
+        view.setFocusable(true);
+
         return new MovieAdapterViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
-        String movieTitle = mMovieData[position][MovieDBJsonUtils.TITLE_ITEM];
+        mCursor.moveToPosition(position);
+
+        String movieTitle = mCursor.getString(MainActivity.INDEX_MOVIE_TITLE);
         movieAdapterViewHolder.mPosterImageView.setContentDescription(movieTitle);
 
         String posterURL =
-                NetworkUtils.buildPosterURL(mMovieData[position][MovieDBJsonUtils.POSTER_ITEM]);
-        Context context = movieAdapterViewHolder.mPosterImageView.getContext();
-        Picasso.with(context).load(posterURL).into(movieAdapterViewHolder.mPosterImageView);
+                NetworkUtils.buildPosterURL(mCursor.getString(MainActivity.INDEX_MOVIE_POSTER));
+        //Context context = movieAdapterViewHolder.mPosterImageView.getContext();
+        Picasso.with(mContext).load(posterURL).into(movieAdapterViewHolder.mPosterImageView);
+
     }
 
     @Override
     public int getItemCount() {
-        if (mMovieData == null) return 0;
-        return mMovieData.length;
+        if (null == mCursor) return 0;
+        return mCursor.getCount();
     }
 
-    public void setMovieData(String[][] movieData) {
-        mMovieData = movieData;
+    void swapCursor(Cursor newCursor) {
+        mCursor = newCursor;
         notifyDataSetChanged();
     }
 

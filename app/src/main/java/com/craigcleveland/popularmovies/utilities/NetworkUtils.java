@@ -1,9 +1,10 @@
 package com.craigcleveland.popularmovies.utilities;
 
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.craigcleveland.popularmovies.MainActivity;
+import com.craigcleveland.popularmovies.data.MovieProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,31 +15,41 @@ import java.util.Scanner;
 
 public final class NetworkUtils {
 
+    // Tag for logging
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
+    // Base URL for all TMDB queries
     private static final String MOVIE_DB_URL =
             "http://api.themoviedb.org/3";
 
     private static final String API_PARAM = "api_key";  // Keeping global for future use.
 
     /**
-     *  Builds the URL used to talk to The Movie DB.  For now just returns popular results
+     *  Builds the URL used to talk to The Movie DB.
      *
      * @return The URL to use to query the weather server
      */
-    public static URL buildUrl(int sortType, String api_key) {
+    public static URL buildTMDBURL(int queryType, String api_key, @Nullable String query_id) {
 
-        String queryPath;
-        if (sortType == MainActivity.HIGHEST_RATED) {
+        Log.d(TAG, "TMDB queryType: " + queryType);
+
+        String queryPath = "0";
+        if (queryType == MovieProvider.TOP_RATED) {
             queryPath = "movie/top_rated";
-        } else {
+        } else if (queryType == MovieProvider.MOST_POPULAR) {
             queryPath = "movie/popular";
+        } else if (queryType == MovieProvider.MOVIE_TRAILERS) {
+            queryPath = "movie/" + query_id + "/videos";
+        } else {
+            throw new IllegalArgumentException();
         }
 
         Uri builtUri = Uri.parse(MOVIE_DB_URL).buildUpon()
                 .appendEncodedPath(queryPath)
                 .appendQueryParameter(API_PARAM, api_key)
                 .build();
+
+        Log.d(TAG, "TMDB URL: " + builtUri.toString());
 
         URL url = null;
         try {

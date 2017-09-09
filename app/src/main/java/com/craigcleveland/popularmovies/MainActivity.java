@@ -2,12 +2,17 @@ package com.craigcleveland.popularmovies;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,29 +21,38 @@ import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.craigcleveland.popularmovies.utilities.MovieDBJsonUtils;
-import com.craigcleveland.popularmovies.utilities.NetworkUtils;
-
-import java.net.URL;
+import com.craigcleveland.popularmovies.data.MovieContract;
+import com.craigcleveland.popularmovies.sync.MovieSyncUtils;
 
 /*
  * Main activity for Popular Movies app displays a list of movie posters.  It opens
  * by default to "most popular" list from data from themoviedb.org API.
  */
-public class MainActivity extends AppCompatActivity
-        implements MovieAdapter.MovieAdapterClickHandler, AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements
+        MovieAdapter.MovieAdapterClickHandler,
+        AdapterView.OnItemSelectedListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
-    // Public variables for use to reference from other classes
-    @SuppressWarnings("WeakerAccess")
-    public static final int MOST_POPULAR = 0;
-    @SuppressWarnings("WeakerAccess")
-    public static final int HIGHEST_RATED = 1;
+    private final String TAG = "TMPDEBUG" + MainActivity.class.getSimpleName();
 
-    //private Spinner mSortOrderSpinner;
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
+    private int mPosition = RecyclerView.NO_POSITION;
+
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
+
+    public static final String[] MOVIE_LIST_PROJECTION = {
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_TITLE,
+            MovieContract.MovieEntry.COLUMN_POSTER
+    };
+
+    public static final int INDEX_MOVIE_ID = 0;
+    public static final int INDEX_MOVIE_TITLE = 1;
+    public static final int INDEX_MOVIE_POSTER = 2;
+
+    private static final int ID_MOVIE_LOADER = 3982;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +74,16 @@ public class MainActivity extends AppCompatActivity
          */
         mRecyclerView.setHasFixedSize(true);
 
-        mMovieAdapter = new MovieAdapter(this);
-
+        mMovieAdapter = new MovieAdapter(this, this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        loadMovieData();
+        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
+
+        showLoading();
+
+        MovieSyncUtils.initialize(this);
+
+        showMovieDataView();
 
     }
 
@@ -113,82 +132,85 @@ public class MainActivity extends AppCompatActivity
      * fetch the data and populate the adapter.
      */
     private void loadMovieData() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String sort_key = getString(R.string.pref_sort_order_key);
-        String sort_default = getString(R.string.pref_sort_order_default);
-        int sortType = Integer.parseInt(sharedPreferences.getString(sort_key, sort_default));
+        int sortType = getSortType();
 
         showMovieDataView();
 
-        URL fetchURL = NetworkUtils.buildUrl(sortType, getString(R.string.tmdbAPIKey));
-        new FetchMovieTask().execute(fetchURL);
 
     }
 
-    public void onClick(String[] clickedMovieDetails) {
+    private int getSortType() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String sort_key = getString(R.string.pref_sort_order_key);
+        String sort_default = getString(R.string.pref_sort_order_default);
+        return Integer.parseInt(sharedPreferences.getString(sort_key, sort_default));
+    }
+
+    public void onClick(int movieID) {
         Class destinationClass = MovieDetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(this, destinationClass);
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, clickedMovieDetails);
+        Uri uriForMovieClicked = MovieContract.MovieEntry.buildMovieDetailUri(movieID);
+        intentToStartDetailActivity.setData(uriForMovieClicked);
         startActivity(intentToStartDetailActivity);
 
     }
 
-    /*
-     * This method hides the error message and displays movie poster grid.
-     */
+    /* This method hides the error message and displays movie poster grid. */
     private void showMovieDataView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
     }
 
-    /*
-     * This method hides the movie poster grid and shows the error message.
-     */
+    /* This method hides the movie poster grid and shows the error message. */
     private void showErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
     }
 
-    private class FetchMovieTask extends AsyncTask<URL, Void, String[][]> {
+    /* This shows the loading indicator and hides the movie grid and error message */
+    private void showLoading() {
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+    }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
 
-        @Override
-        protected String[][] doInBackground(URL... params) {
+    @Override
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
-            /* If there's no URL, nothing to look up. */
-            if (params.length == 0) {
-                return null;
-            }
+        switch (loaderId) {
+            case ID_MOVIE_LOADER:
+                Uri movieQueryUri = MovieContract.MovieEntry.CONTENT_URI;
 
-            URL requestURL = params[0];
+                Log.d(TAG, "MovieQueryUri: " + movieQueryUri.toString());
 
-            try {
-                String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(requestURL);
+                return new CursorLoader(this,
+                        movieQueryUri,
+                        MOVIE_LIST_PROJECTION,
+                        null,
+                        null,
+                        null);
 
-                return MovieDBJsonUtils.getSimpleMovieStringsFromJson(jsonMovieResponse);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-
-        }
-
-        @Override
-        protected void onPostExecute(String[][] movieData) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (movieData != null) {
-                showMovieDataView();
-                mMovieAdapter.setMovieData(movieData);
-            } else {
-                showErrorMessage();
-            }
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loaderId);
         }
 
     }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (null == data) throw new RuntimeException("No data returned from the loader");
+        mMovieAdapter.swapCursor(data);
+        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+        mRecyclerView.smoothScrollToPosition(mPosition);
+        if (data.getCount() != 0) showMovieDataView();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mMovieAdapter.swapCursor(null);
+    }
+
 }

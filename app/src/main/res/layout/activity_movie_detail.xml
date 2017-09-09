@@ -1,72 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="16dp"
-    tools:context="com.craigcleveland.popularmovies.MovieDetailActivity">
-
-    <ImageView
-        android:id="@+id/iv_poster"
-        android:contentDescription="@string/movie_poster_desc"
-        android:paddingBottom="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/tv_detail_title"
-        android:text="@string/movie_title"
-        android:textSize="36sp"
-        android:gravity="center_horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:background="@color/colorPrimaryLight"
+        android:gravity="center"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="24sp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/movie_title" />
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:stretchColumns="0,1">
-        <TableRow>
-            <TextView
-                android:text="@string/user_rating"
-                android:layout_gravity="end"
-                android:textStyle="bold"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp" />
-            <TextView
-                android:id="@+id/tv_detail_user_rating" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/release_date"
-                android:layout_gravity="end"
-                android:textStyle="bold"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"/>
-            <TextView
-                android:id="@+id/tv_detail_release_date" />
-        </TableRow>
-    </TableLayout>
-    <View
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/colorPrimary" />
+    <ImageView
+        android:id="@+id/iv_poster"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="Movie Poster"
+        android:scaleType="fitCenter"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/tv_detail_release_date"
+        app:layout_constraintTop_toBottomOf="@+id/tv_detail_title"
+        app:srcCompat="@drawable/sample" />
+
+
     <TextView
+        android:id="@+id/tv_detail_release_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/colorPrimaryText"
+        app:layout_constraintBottom_toTopOf="@+id/iv_poster"
+        app:layout_constraintLeft_toRightOf="@+id/iv_poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_poster"
+        app:layout_constraintVertical_bias="0.65999997"
+        tools:text="March 13, 1975" />
+
+    <TextView
+        android:id="@+id/tv_detail_user_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="@string/synopsis"/>
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/tv_detail_synopsis"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </ScrollView>
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintLeft_toRightOf="@+id/iv_poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_detail_release_date"
+        tools:text="10 / 10" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/tv_detail_synopsis"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_poster"
+        tools:text="King Arthur and his companions search for the Holy Grail and encounter all sorts of mayhem" />
+</android.support.constraint.ConstraintLayout>

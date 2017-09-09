@@ -4,10 +4,8 @@
     <string name="movie_poster_desc">Movie Poster</string>
     <string name="network_error_message">An error has occurred fetching data. Check network availability.</string>
     <string name="movie_title">Movie Title</string>
-    <string name="user_rating">User rating:</string>
-    <string name="release_date">Release date:</string>
-    <string name="synopsis">Synopsis:</string>
     <string name="about">About</string>
+    <string name="content_authority">com.craigcleveland.popularmovies</string>
 
     <!-- Strings related to Settings -->
     <string name="settings">Settings</string>

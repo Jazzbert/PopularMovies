@@ -46,6 +46,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
+            mCursor.moveToPosition(adapterPosition);
             mClickHandler.onClick(mCursor.getInt(MainActivity.INDEX_MOVIE_ID));
         }
     }

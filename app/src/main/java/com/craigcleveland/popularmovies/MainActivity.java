@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements
     public static final int INDEX_MOVIE_TITLE = 1;
     public static final int INDEX_MOVIE_POSTER = 2;
 
-    private static final int ID_MOVIE_LOADER = 3982;
+    private static final int ID_MOVIE_LOADER = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

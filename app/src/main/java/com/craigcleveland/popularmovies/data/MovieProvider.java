@@ -59,6 +59,21 @@ public class MovieProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
+
+            case MOVIE_DETAIL:
+                String movie_ID = uri.getLastPathSegment();
+                selectArgs = new String[]{movie_ID};
+
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ",
+                        selectArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
             default:
                 throw new UnsupportedOperationException( "Uri not recognized: " + uri.toString());
         }

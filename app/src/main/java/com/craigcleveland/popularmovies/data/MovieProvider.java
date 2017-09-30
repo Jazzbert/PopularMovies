@@ -51,7 +51,7 @@ public class MovieProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case MOVIE_LIST:
                 cursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.TABLE_NAME,
+                        MovieContract.MovieEntry.MOVIE_TABLE_NAME,
                         projection,
                         selection,
                         selectArgs,
@@ -65,7 +65,7 @@ public class MovieProvider extends ContentProvider {
                 selectArgs = new String[]{movie_ID};
 
                 cursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.TABLE_NAME,
+                        MovieContract.MovieEntry.MOVIE_TABLE_NAME,
                         projection,
                         MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ",
                         selectArgs,
@@ -105,7 +105,7 @@ public class MovieProvider extends ContentProvider {
                 int rowsInserted = 0;
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, value);
+                        long _id = db.insert(MovieContract.MovieEntry.MOVIE_TABLE_NAME, null, value);
                         if (_id != -1) {
                             rowsInserted++;
                         }
@@ -138,7 +138,7 @@ public class MovieProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case MOVIE_LIST:
                 numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
-                        MovieContract.MovieEntry.TABLE_NAME,
+                        MovieContract.MovieEntry.MOVIE_TABLE_NAME,
                         selection,
                         selectionArgs);
                 break;

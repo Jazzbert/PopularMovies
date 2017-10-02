@@ -18,8 +18,10 @@ public class MovieContract {
     public static final String PATH_TRAILERS = "videos";
 
     public static final class MovieEntry implements BaseColumns {
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+        public static final Uri MOVIE_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_MOVIE).build();
+        public static final Uri TRAILER_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_TRAILERS).build();
         public static final Uri POPULAR_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_POPULAR).build();
         public static final Uri TOP_RATED_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
@@ -42,12 +44,12 @@ public class MovieContract {
         public static final String COLUMN_TRAILER_SITE = "trailer_site";
 
         public static Uri buildMovieDetailUri(int movieID) {
-            return CONTENT_URI.buildUpon()
+            return MOVIE_CONTENT_URI.buildUpon()
                     .appendPath(Integer.toString(movieID)).build();
         }
 
         public static Uri buildTrailerListUri(int movieID) {
-            return CONTENT_URI.buildUpon()
+            return MOVIE_CONTENT_URI.buildUpon()
                     .appendPath(Integer.toString(movieID))
                     .appendPath(PATH_TRAILERS).build();
         }

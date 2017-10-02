@@ -19,8 +19,16 @@ public class MovieProvider extends ContentProvider {
     public static final int MOVIE_LIST = 100;
     public static final int MOST_POPULAR = 101;
     public static final int TOP_RATED = 102;
+    public static final String MOVIES_URI_STRING = MovieContract.PATH_MOVIE;
+
     public static final int MOVIE_DETAIL = 200;
-    public static final int MOVIE_TRAILERS = 300;
+    public static final String MOVIE_DETAIL_URI_STRING = MovieContract.PATH_MOVIE + "/#";
+
+    public static final int TRAILERS_LIST = 300;
+    public static final String TRAILERS_URI_STRING = MovieContract.PATH_TRAILERS;
+
+    public static final int TRAILER_DETAIL = 400;
+    public static final String TRAILER_DETAIL_URI_STRING = MovieContract.PATH_TRAILERS + "/#";
 
     public static final UriMatcher sUriMatcher = buildUriMatcher();
     private MovieDbHelper mOpenHelper;
@@ -29,8 +37,10 @@ public class MovieProvider extends ContentProvider {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE_LIST);
-        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", MOVIE_DETAIL);
+        matcher.addURI(authority, MOVIES_URI_STRING, MOVIE_LIST);
+        matcher.addURI(authority, MOVIE_DETAIL_URI_STRING, MOVIE_DETAIL);
+        matcher.addURI(authority, TRAILERS_URI_STRING, TRAILERS_LIST);
+        matcher.addURI(authority, TRAILER_DETAIL_URI_STRING, TRAILER_DETAIL);
 
         return matcher;
 
@@ -74,6 +84,31 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
 
+            case TRAILERS_LIST:
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TRAILER_TABLE_NAME,
+                        projection,
+                        selection,
+                        selectArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
+            case TRAILER_DETAIL:
+                String trailer_ID = uri.getLastPathSegment();
+                selectArgs = new String[]{trailer_ID};
+
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TRAILER_TABLE_NAME,
+                        projection,
+                        MovieContract.MovieEntry.COLUMN_TRAILER_ID + " = ? ",
+                        selectArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
             default:
                 throw new UnsupportedOperationException( "Uri not recognized: " + uri.toString());
         }
@@ -98,14 +133,36 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int rowsInserted;
 
         switch (sUriMatcher.match(uri)) {
             case MOVIE_LIST:
                 db.beginTransaction();
-                int rowsInserted = 0;
+                rowsInserted = 0;
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insert(MovieContract.MovieEntry.MOVIE_TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            rowsInserted++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                if (rowsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowsInserted;
+
+            case TRAILERS_LIST:
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(MovieContract.MovieEntry.TRAILER_TABLE_NAME, null, value);
                         if (_id != -1) {
                             rowsInserted++;
                         }
@@ -139,6 +196,13 @@ public class MovieProvider extends ContentProvider {
             case MOVIE_LIST:
                 numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
                         MovieContract.MovieEntry.MOVIE_TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+
+            case TRAILERS_LIST:
+                numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
+                        MovieContract.MovieEntry.TRAILER_TABLE_NAME,
                         selection,
                         selectionArgs);
                 break;

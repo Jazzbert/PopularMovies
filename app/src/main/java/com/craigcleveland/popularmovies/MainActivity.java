@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements
         Intent intentToStartDetailActivity = new Intent(this, destinationClass);
         Uri uriForMovieClicked = MovieContract.MovieEntry.buildMovieDetailUri(movieID);
         intentToStartDetailActivity.setData(uriForMovieClicked);
+        intentToStartDetailActivity.putExtra(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieID);
         startActivity(intentToStartDetailActivity);
 
     }
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (loaderId) {
             case ID_MOVIE_LOADER:
-                Uri movieQueryUri = MovieContract.MovieEntry.CONTENT_URI;
+                Uri movieQueryUri = MovieContract.MovieEntry.MOVIE_CONTENT_URI;
 
                 Log.d(TAG, "MovieQueryUri: " + movieQueryUri.toString());
 

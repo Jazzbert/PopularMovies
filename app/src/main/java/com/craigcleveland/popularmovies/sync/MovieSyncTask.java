@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -41,7 +42,7 @@ public class MovieSyncTask {
             URL movieRequestUrl = NetworkUtils.buildTMDBURL(
                     sortType,
                     context.getString(R.string.tmdbAPIKey),
-                    null);
+                    -1);
 
             String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
 
@@ -52,10 +53,10 @@ public class MovieSyncTask {
 
             if (movieValues != null && movieValues.length != 0) {
                 ContentResolver movieCR = context.getContentResolver();
-                int numRowsDeleted = movieCR.delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
+                int numRowsDeleted = movieCR.delete(MovieContract.MovieEntry.MOVIE_CONTENT_URI, null, null);
                 Log.d("CCDEBUG" + TAG, "rows deleted = " + numRowsDeleted);
 
-                int numRowsInserted = movieCR.bulkInsert(MovieContract.MovieEntry.CONTENT_URI, movieValues);
+                int numRowsInserted = movieCR.bulkInsert(MovieContract.MovieEntry.MOVIE_CONTENT_URI, movieValues);
                 Log.d("CCDEBUG" + TAG, "rows inserted = " + numRowsInserted);
 
             }
@@ -63,6 +64,40 @@ public class MovieSyncTask {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    synchronized public static void syncTrailers(Context context, int movie_id) {
+
+        Log.d("CCDEBUG " + TAG, "syncTrailers has started");
+
+        try {
+            URL movieRequestUrl = NetworkUtils.buildTMDBURL(
+                    MovieProvider.TRAILERS_LIST,
+                    context.getString(R.string.tmdbAPIKey),
+                    movie_id);
+
+            String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
+
+            ContentValues[] trailerValues = MovieDBJsonUtils
+                    .getTrailerContentValuesFromJson(context, jsonMovieResponse);
+
+            if (trailerValues != null && trailerValues.length != 0) {
+                ContentResolver trailerCR = context.getContentResolver();
+                int numRowsDeleted = trailerCR.delete(MovieContract.MovieEntry.TRAILER_CONTENT_URI,
+                        null, null);
+                Log.d("CCDEBUG" + TAG, "trailer rows deleted = " + numRowsDeleted);
+
+                int numRowsInserted = trailerCR.bulkInsert(
+                        MovieContract.MovieEntry.TRAILER_CONTENT_URI, trailerValues);
+                Log.d("CCDEBUG" + TAG, "trailer rows inserted = " + numRowsInserted);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
     }
 

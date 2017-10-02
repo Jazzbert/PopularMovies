@@ -30,10 +30,11 @@ public class MovieDBJsonUtils {
     public static final int MOVIE_SYNOPSIS = 5;
 
     /* Trailer Data Structure */
-    public static final int TRAILER_NAME = 0;
-    public static final int TRAILER_KEY = 1;
-    public static final int TRAILER_SITE = 2;
-    public static final int TRAILER_TYPE = 3;
+    public static final int TRAILER_ID = 0;
+    public static final int TRAILER_NAME = 1;
+    public static final int TRAILER_KEY = 2;
+    public static final int TRAILER_SITE = 3;
+    public static final int TRAILER_MOVIE_ID = 4;
 
     /* Movie field information */
     private static final String TMD_RESULTS_LABEL = "results";
@@ -45,6 +46,7 @@ public class MovieDBJsonUtils {
     private static final String MOVIE_RELEASE_DATE_LABEL = "release_date";
     private static final String MOVIE_SYNOPSIS_LABEL = "overview";
 
+    private static final String TRAILER_ID_LABEL = "id";
     private static final String TRAILER_NAME_LABEL = "name";
     private static final String TRAILER_KEY_LABEL = "key";
     private static final String TRAILER_SITE_LABEL = "site";
@@ -99,6 +101,41 @@ public class MovieDBJsonUtils {
         }
 
         return movieContentValues;
+
+    }
+
+    public static ContentValues[] getTrailerContentValuesFromJson(Context context,
+                                                                  String trailerJsonStr)
+        throws JSONException {
+        JSONObject trailerJson = new JSONObject(trailerJsonStr);
+
+        if (checkResponseError(trailerJson)) throw new UnsupportedOperationException();
+
+        int movie_id = trailerJson.getInt(MOVIE_ID_LABEL);
+
+        JSONArray jsonTrailerArray = trailerJson.getJSONArray(TMD_RESULTS_LABEL);
+
+        // Extra CV for Movie ID
+        ContentValues[] trailerCVs = new ContentValues[jsonTrailerArray.length()];
+        for (int i = 0; i < jsonTrailerArray.length(); i++) {
+            JSONObject trailer = jsonTrailerArray.getJSONObject(i);
+            String trailerID = trailer.getString(TRAILER_ID_LABEL);
+            String trailerName = trailer.getString(TRAILER_NAME_LABEL);
+            String trailerKey = trailer.getString(TRAILER_KEY_LABEL);
+            String trailerSite = trailer.getString(TRAILER_SITE_LABEL);
+
+            ContentValues trailerValues = new ContentValues();
+            trailerValues.put(MovieContract.MovieEntry.COLUMN_TRAILER_ID, trailerID);
+            trailerValues.put(MovieContract.MovieEntry.COLUMN_TRAILER_NAME, trailerName);
+            trailerValues.put(MovieContract.MovieEntry.COLUMN_TRAILER_KEY, trailerKey);
+            trailerValues.put(MovieContract.MovieEntry.COLUMN_TRAILER_SITE, trailerSite);
+            trailerValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie_id);
+
+            trailerCVs[i] = trailerValues;
+
+        }
+
+        return trailerCVs;
 
     }
 
@@ -176,9 +213,6 @@ public class MovieDBJsonUtils {
 
             // Trailer Site
             trailerData[i][TRAILER_SITE] = trailer.getString(TRAILER_SITE_LABEL);
-
-            // Trailer Type
-            trailerData[i][TRAILER_TYPE] = trailer.getString(TRAILER_TYPE_LABEL);
         }
 
         return trailerData;

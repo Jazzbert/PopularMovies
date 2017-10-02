@@ -29,7 +29,7 @@ public final class NetworkUtils {
      *
      * @return The URL to use to query the weather server
      */
-    public static URL buildTMDBURL(int queryType, String api_key, @Nullable String query_id) {
+    public static URL buildTMDBURL(int queryType, String api_key, @Nullable int query_id) {
 
         Log.d(TAG, "TMDB queryType: " + queryType);
 
@@ -38,8 +38,8 @@ public final class NetworkUtils {
             queryPath = "movie/top_rated";
         } else if (queryType == MovieProvider.MOST_POPULAR) {
             queryPath = "movie/popular";
-        } else if (queryType == MovieProvider.MOVIE_TRAILERS) {
-            queryPath = "movie/" + query_id + "/videos";
+        } else if (queryType == MovieProvider.TRAILERS_LIST) {
+            queryPath = "movie/" + Integer.toString(query_id) + "/videos";
         } else {
             throw new IllegalArgumentException();
         }

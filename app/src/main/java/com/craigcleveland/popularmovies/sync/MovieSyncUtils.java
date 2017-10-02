@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.craigcleveland.popularmovies.data.MovieContract;
-import com.craigcleveland.popularmovies.sync.MovieSyncIntentService;
 
 /**
  * Created by craig on 8/26/17.
@@ -15,18 +14,19 @@ import com.craigcleveland.popularmovies.sync.MovieSyncIntentService;
 
 public class MovieSyncUtils {
 
-    private static boolean sInitialized;
+    private static boolean sMovieSyncInitialized;
+    private static boolean sTrailerSyncInitialized;
 
     synchronized public static void initialize(@NonNull final Context context) {
 
-        if (sInitialized) return;
+        if (sMovieSyncInitialized) return;
 
-        sInitialized = true;
+        sMovieSyncInitialized = true;
 
         Thread checkForEmpty = new Thread(new Runnable() {
             @Override
             public void run() {
-                Uri movieQueryUri = MovieContract.MovieEntry.CONTENT_URI;
+                Uri movieQueryUri = MovieContract.MovieEntry.MOVIE_CONTENT_URI;
 
                 String[] projectionColumns = {MovieContract.MovieEntry._ID};
 
@@ -52,6 +52,15 @@ public class MovieSyncUtils {
     public static void startImmediateSync(@NonNull final Context context) {
         Intent intentToSyncImmediately = new Intent(context, MovieSyncIntentService.class);
         context.startService(intentToSyncImmediately);
+    }
+
+    synchronized public static void syncTrailerList(@NonNull final Context context) {
+        if (sTrailerSyncInitialized) return;
+
+        sTrailerSyncInitialized = true;
+
+
+
     }
 
 }

@@ -13,6 +13,7 @@
         android:src="@android:drawable/ic_media_play"
         android:tint="@android:color/black"/>
     <TextView
+        android:id="@+id/tv_trailer_name"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"

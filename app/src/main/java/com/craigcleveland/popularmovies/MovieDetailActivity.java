@@ -2,6 +2,7 @@ package com.craigcleveland.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -36,12 +37,22 @@ public class MovieDetailActivity extends AppCompatActivity implements
             MovieContract.MovieEntry.COLUMN_SYNOPSIS,
     };
 
-    private static final int INDEX_MOVIE_POSTER = 0;
-    private static final int INDEX_MOVIE_TITLE = 1;
-    private static final int INDEX_MOVIE_RELEASE_DATE = 2;
-    private static final int INDEX_MOVIE_RATING = 3;
-    private static final int INDEX_MOVIE_SYNOPSIS = 4;
+    public static final int INDEX_MOVIE_POSTER = 0;
+    public static final int INDEX_MOVIE_TITLE = 1;
+    public static final int INDEX_MOVIE_RELEASE_DATE = 2;
+    public static final int INDEX_MOVIE_RATING = 3;
+    public static final int INDEX_MOVIE_SYNOPSIS = 4;
+    
+    public static final String[] TRAILER_LIST_PROJECTION = {
+            MovieContract.MovieEntry.COLUMN_TRAILER_ID,
+            MovieContract.MovieEntry.COLUMN_TRAILER_KEY,
+            MovieContract.MovieEntry.COLUMN_TRAILER_NAME
+    };
 
+    public static final int INDEX_TRAILER_ID = 0;
+    public static final int INDEX_TRAILER_KEY = 1;
+    public static final int INDEX_TRAILER_NAME = 2;
+    
     private static final int ID_DETAIL_LOADER = 1200;
     private static final int TRAILER_LIST_LOADER = 1300;
 

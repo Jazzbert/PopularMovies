@@ -28,5 +28,6 @@
     <string name="tmdb_credit">Content for this application is\n provided by TheMovieDB.com</string>
     <string name="creator_email">craig.cleveland@gmail.com</string>
     <string name="trailers">Trailers</string>
+    <string name="movie_poster">Movie Poster</string>
 
 </resources>

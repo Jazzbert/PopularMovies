@@ -1,8 +1,7 @@
 package com.craigcleveland.popularmovies;
 
-import android.content.Context;
+import android.content.ContentResolver;
 import android.database.Cursor;
-import android.graphics.Movie;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -10,24 +9,25 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.craigcleveland.popularmovies.data.MovieContract;
 import com.craigcleveland.popularmovies.sync.MovieSyncTask;
-import com.craigcleveland.popularmovies.sync.MovieSyncUtils;
-import com.craigcleveland.popularmovies.utilities.MovieDBJsonUtils;
 import com.craigcleveland.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-
 public class MovieDetailActivity extends AppCompatActivity implements
+        TrailerAdapter.TrailerAdapterClickHandler,
+        AdapterView.OnItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = MovieDetailActivity.class.getSimpleName();
+    private static final String TAG = "CCDEBUG-" + MovieDetailActivity.class.getSimpleName();
 
     private static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_POSTER,
@@ -56,11 +56,15 @@ public class MovieDetailActivity extends AppCompatActivity implements
     private static final int ID_DETAIL_LOADER = 1200;
     private static final int TRAILER_LIST_LOADER = 1300;
 
-    private static ImageView sPosterImageView;
-    private static TextView sMovieTitleTextView;
-    private static TextView sReleaseDateTextView;
-    private static TextView sUserRatingTextView;
-    private static TextView sSynopsisTextView;
+    private ImageView mPosterImageView;
+    private TextView mMovieTitleTextView;
+    private TextView mReleaseDateTextView;
+    private TextView mUserRatingTextView;
+    private TextView mSynopsisTextView;
+
+    private RecyclerView mTrailerRecyclerView;
+    private TrailerAdapter mTrailerAdapter;
+    private int mTrailerPosition = RecyclerView.NO_POSITION;
 
     private static int sMovieID;
 
@@ -70,19 +74,29 @@ public class MovieDetailActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-
         sMovieID = getIntent().getIntExtra(MovieContract.MovieEntry.COLUMN_MOVIE_ID, -1);
 
-        sPosterImageView = (ImageView) findViewById(R.id.iv_poster);
-        sMovieTitleTextView = (TextView) findViewById(R.id.tv_detail_title);
-        sReleaseDateTextView = (TextView) findViewById(R.id.tv_detail_release_date);
-        sUserRatingTextView = (TextView) findViewById(R.id.tv_detail_user_rating);
-        sSynopsisTextView = (TextView) findViewById(R.id.tv_detail_synopsis);
+        // Establish basic movie detail items
+        mPosterImageView = (ImageView) findViewById(R.id.iv_poster);
+        mMovieTitleTextView = (TextView) findViewById(R.id.tv_detail_title);
+        mReleaseDateTextView = (TextView) findViewById(R.id.tv_detail_release_date);
+        mUserRatingTextView = (TextView) findViewById(R.id.tv_detail_user_rating);
+        mSynopsisTextView = (TextView) findViewById(R.id.tv_detail_synopsis);
 
         mUri = getIntent().getData();
         if (null == mUri) throw new NullPointerException("URI for DetailActivity cannot be null");
 
+        // Establish trailer layout items
+        mTrailerRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
 
+        LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this);
+        mTrailerRecyclerView.setLayoutManager(trailerLayoutManager);
+        mTrailerRecyclerView.setHasFixedSize(true);
+
+        mTrailerAdapter = new TrailerAdapter(this, this);
+        mTrailerRecyclerView.setAdapter(mTrailerAdapter);
+
+        // Start data loads
         LoaderManager loaderManager = getSupportLoaderManager();
 
         Loader<Cursor> movieDetailLoader = loaderManager.getLoader(ID_DETAIL_LOADER);
@@ -99,10 +113,6 @@ public class MovieDetailActivity extends AppCompatActivity implements
             loaderManager.restartLoader(TRAILER_LIST_LOADER, null, this);
         }
 
-        Toast.makeText(this, "MovieID: " + Integer.toString(sMovieID), Toast.LENGTH_LONG).show();
-
-
-
 
     }
 
@@ -110,7 +120,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
     public Loader<Cursor> onCreateLoader(int id, final Bundle args) {
         switch (id) {
             case ID_DETAIL_LOADER:
-                Log.d("CCDEBUG " + TAG, "Getting detail data");
+                Log.d(TAG, "Getting detail data");
                 return new CursorLoader(this,
                         mUri,
                         MOVIE_DETAIL_PROJECTION,
@@ -119,7 +129,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
                         null);
 
             case TRAILER_LIST_LOADER:
-                Log.d("CCDEBUG " + TAG, "Beginning trailer load");
+                Log.d(TAG, "Beginning trailer load");
                 return new AsyncTaskLoader<Cursor>(this) {
                     @Override
                     protected void onStartLoading() {
@@ -129,9 +139,23 @@ public class MovieDetailActivity extends AppCompatActivity implements
                     @Override
                     public Cursor loadInBackground() {
                         if (sMovieID <=0) return null;
+                        Log.d(TAG, "Getting trailer data from Internet");
                         MovieSyncTask.syncTrailers(getContext(), sMovieID);
+                        Log.d(TAG, "Completed trailer data load");
 
-                        return null;
+                        Uri trailerUri = MovieContract.MovieEntry.TRAILER_CONTENT_URI;
+                        Log.d(TAG, "TrailerURI: " + trailerUri.toString());
+                        ContentResolver trailerCR = getContext().getContentResolver();
+                        Cursor result = trailerCR.query(trailerUri,
+                                MovieDetailActivity.TRAILER_LIST_PROJECTION,
+                                null,
+                                null,
+                                null);
+
+                        Log.d(TAG, "Trailer Cursor rows: " + Integer.toString(result.getCount()));
+
+                        return result;
+
                     }
                 };
 
@@ -154,31 +178,26 @@ public class MovieDetailActivity extends AppCompatActivity implements
 
                 if (!cursorHasValidData) return;
 
-                Log.d("CCDEBUG" + TAG, "Rows in detail cursor: " + data.getCount());
+                Log.d(TAG, "Rows in detail cursor: " + data.getCount());
 
                 // Set Poster
                 String posterUrl =
                         NetworkUtils.buildPosterURL(data.getString(INDEX_MOVIE_POSTER));
-                Picasso.with(this).load(posterUrl).into(sPosterImageView);
+                Picasso.with(this).load(posterUrl).into(mPosterImageView);
 
                 // Set Remaining Text Items
-                sMovieTitleTextView.setText(data.getString(INDEX_MOVIE_TITLE));
-                sReleaseDateTextView.setText(data.getString(INDEX_MOVIE_RELEASE_DATE));
-                sUserRatingTextView.setText(data.getString(INDEX_MOVIE_RATING));
-                sSynopsisTextView.setText(data.getString(INDEX_MOVIE_SYNOPSIS));
+                mMovieTitleTextView.setText(data.getString(INDEX_MOVIE_TITLE));
+                mReleaseDateTextView.setText(data.getString(INDEX_MOVIE_RELEASE_DATE));
+                mUserRatingTextView.setText(data.getString(INDEX_MOVIE_RATING));
+                mSynopsisTextView.setText(data.getString(INDEX_MOVIE_SYNOPSIS));
 
                 break;
 
             case TRAILER_LIST_LOADER:
                 /* Check if we have valid data in the cursor */
-                if (data != null && data.moveToFirst()) {
-                    cursorHasValidData = true;
-                }
-
-                if (!cursorHasValidData) return;
-
-                Log.d("CCDEBUG" + TAG, "Rows in trailer cursor: " + data.getCount());
-
+                if (null == data) throw new RuntimeException("No data returned from the loader");
+                mTrailerAdapter.swapCursor(data);
+                if (mTrailerPosition == RecyclerView.NO_POSITION) mTrailerPosition = 0;
                 break;
 
             default:
@@ -189,6 +208,21 @@ public class MovieDetailActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        // Do nothing
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        // Do nothing
+    }
+
+    @Override
+    public void onClick(int trailerID) {
+        // TODO: Add code to launch implicit (explicit?) intent for youtube video
     }
 
 //    public class DetailDataLoader extends AsyncTaskLoader<Void> {
@@ -203,9 +237,9 @@ public class MovieDetailActivity extends AppCompatActivity implements
 //
 //        @Override
 //        public Void loadInBackground() {
-//            Log.d("CCDEBUG " + TAG, "Starting trailer sync");
+//            Log.d(TAG, "Starting trailer sync");
 //            MovieSyncTask.syncTrailers(getContext(), mMovieID);
-//            Log.d("CCDEBUG " + TAG, "Finished trailer sync");
+//            Log.d(TAG, "Finished trailer sync");
 //
 //            return null;
 //        }

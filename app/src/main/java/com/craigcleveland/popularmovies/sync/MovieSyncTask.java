@@ -22,7 +22,7 @@ import java.net.URL;
 
 public class MovieSyncTask {
 
-    private static final String TAG = MovieSyncTask.class.getSimpleName();
+    private static final String TAG = "CCDEBUG-" + MovieSyncTask.class.getSimpleName();
 
     synchronized public static void syncMovies(Context context) {
 
@@ -49,15 +49,15 @@ public class MovieSyncTask {
             ContentValues[] movieValues = MovieDBJsonUtils
                     .getMovieContentValuesFromJson(context, jsonMovieResponse);
 
-            Log.d("CCDEBUG" + TAG, "movieValues length = " + movieValues.length);
+            Log.d(TAG, "movieValues length = " + movieValues.length);
 
             if (movieValues != null && movieValues.length != 0) {
                 ContentResolver movieCR = context.getContentResolver();
                 int numRowsDeleted = movieCR.delete(MovieContract.MovieEntry.MOVIE_CONTENT_URI, null, null);
-                Log.d("CCDEBUG" + TAG, "rows deleted = " + numRowsDeleted);
+                Log.d(TAG, "rows deleted = " + numRowsDeleted);
 
                 int numRowsInserted = movieCR.bulkInsert(MovieContract.MovieEntry.MOVIE_CONTENT_URI, movieValues);
-                Log.d("CCDEBUG" + TAG, "rows inserted = " + numRowsInserted);
+                Log.d(TAG, "rows inserted = " + numRowsInserted);
 
             }
 
@@ -69,7 +69,7 @@ public class MovieSyncTask {
 
     synchronized public static void syncTrailers(Context context, int movie_id) {
 
-        Log.d("CCDEBUG " + TAG, "syncTrailers has started");
+        Log.d(TAG, "syncTrailers has started");
 
         try {
             URL movieRequestUrl = NetworkUtils.buildTMDBURL(
@@ -86,11 +86,12 @@ public class MovieSyncTask {
                 ContentResolver trailerCR = context.getContentResolver();
                 int numRowsDeleted = trailerCR.delete(MovieContract.MovieEntry.TRAILER_CONTENT_URI,
                         null, null);
-                Log.d("CCDEBUG" + TAG, "trailer rows deleted = " + numRowsDeleted);
+                Log.d(TAG, "trailer rows deleted = " + numRowsDeleted);
 
                 int numRowsInserted = trailerCR.bulkInsert(
                         MovieContract.MovieEntry.TRAILER_CONTENT_URI, trailerValues);
-                Log.d("CCDEBUG" + TAG, "trailer rows inserted = " + numRowsInserted);
+                Log.d(TAG, "trailer rows inserted = " + numRowsInserted);
+                Log.d(TAG, "inserted at URI: " + MovieContract.MovieEntry.TRAILER_CONTENT_URI);
 
             }
 

@@ -3,6 +3,8 @@ package com.craigcleveland.popularmovies.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 import com.craigcleveland.popularmovies.data.MovieContract.MovieEntry;
 
 /**
@@ -10,9 +12,12 @@ import com.craigcleveland.popularmovies.data.MovieContract.MovieEntry;
  */
 
 public class MovieDbHelper extends SQLiteOpenHelper {
+
+    private final String TAG = "CCDEBUG" + MovieDbHelper.class.getSimpleName();
+
     public static final String DATABASE_NAME = "movie.db";
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     public MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -41,13 +46,31 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_TRAILER_SITE  + " TEXT NOT NULL, " +
                 "UNIQUE (" + MovieEntry.COLUMN_TRAILER_ID + ") ON CONFLICT REPLACE);";
 
+        final String SQL_CREATE_REVIEWS_TABLE =
+                "CREATE TABLE " + MovieEntry.REVIEW_TABLE_NAME + " (" +
+                MovieEntry._ID                   + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                MovieEntry.COLUMN_REVIEW_ID      + " INTEGER NOT NULL, " +
+                MovieEntry.COLUMN_REVIEW_AUTHOR  + " TEXT, " +
+                MovieEntry.COLUMN_REVIEW_CONTENT + " TEXT, " +
+                "UNIQUE (" + MovieEntry.COLUMN_REVIEW_ID + ") ON CONFLICT REPLACE);";
+
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_TRAILERS_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_REVIEWS_TABLE);
+
+        Log.d(TAG, "Finished running DB Updates");
+
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVer, int newVer) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.MOVIE_TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TRAILER_TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.REVIEW_TABLE_NAME);
         onCreate(sqLiteDatabase);
+
+        Log.d(TAG, "Finished cleaning up old DB version");
+
     }
 }

@@ -16,12 +16,15 @@ public class MovieContract {
     public static final String PATH_POPULAR = "movie/popular";
     public static final String PATH_TOP_RATED = "movie/top_rated";
     public static final String PATH_TRAILERS = "videos";
+    public static final String PATH_REVIEWS = "reviews";
 
     public static final class MovieEntry implements BaseColumns {
         public static final Uri MOVIE_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_MOVIE).build();
         public static final Uri TRAILER_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_TRAILERS).build();
+        public static final Uri REVIEWS_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_REVIEWS).build();
         public static final Uri POPULAR_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_POPULAR).build();
         public static final Uri TOP_RATED_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
@@ -43,6 +46,13 @@ public class MovieContract {
         public static final String COLUMN_TRAILER_KEY = "trailer_key";
         public static final String COLUMN_TRAILER_SITE = "trailer_site";
 
+        /* Review Table */
+        public static final String REVIEW_TABLE_NAME = "reviews";
+        public static final String COLUMN_REVIEW_ID = "review_id";
+        public static final String COLUMN_REVIEW_AUTHOR = "review_author";
+        public static final String COLUMN_REVIEW_CONTENT = "review_content";
+
+
         public static Uri buildMovieDetailUri(int movieID) {
             return MOVIE_CONTENT_URI.buildUpon()
                     .appendPath(Integer.toString(movieID)).build();
@@ -52,6 +62,12 @@ public class MovieContract {
             return MOVIE_CONTENT_URI.buildUpon()
                     .appendPath(Integer.toString(movieID))
                     .appendPath(PATH_TRAILERS).build();
+        }
+
+        public static Uri buildReviewListUri(int movieID) {
+            return MOVIE_CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(movieID))
+                    .appendPath(PATH_REVIEWS).build();
         }
 
     }

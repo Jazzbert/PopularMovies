@@ -23,7 +23,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
     private Cursor mCursor;
 
     public interface TrailerAdapterClickHandler {
-        void onClick(int trailerID);
+        void onClick(String trailerKey);
     }
 
     public TrailerAdapter(@NonNull Context context, TrailerAdapterClickHandler clickHandler) {
@@ -46,7 +46,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-            mClickHandler.onClick(mCursor.getInt(MovieDetailActivity.INDEX_TRAILER_ID));
+            mClickHandler.onClick(mCursor.getString(MovieDetailActivity.INDEX_TRAILER_KEY));
         }
     }
 

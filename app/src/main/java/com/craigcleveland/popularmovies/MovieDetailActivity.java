@@ -1,6 +1,7 @@
 package com.craigcleveland.popularmovies;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
@@ -221,8 +222,13 @@ public class MovieDetailActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onClick(int trailerID) {
-        // TODO: Add code to launch implicit (explicit?) intent for youtube video
+    public void onClick(String trailerKey) {
+        Intent watchVideo = new Intent(Intent.ACTION_VIEW);
+        Uri videoUri = Uri.parse("http://www.youtube.com/embed/" + trailerKey);
+        watchVideo.setData(videoUri);
+        if (watchVideo.resolveActivity(getPackageManager()) != null) {
+            startActivity(watchVideo);
+        }
     }
 
 //    public class DetailDataLoader extends AsyncTaskLoader<Void> {

@@ -34,6 +34,12 @@ public class MovieProvider extends ContentProvider {
     public static final int TRAILER_DETAIL = 400;
     public static final String TRAILER_DETAIL_URI_STRING = MovieContract.PATH_TRAILERS + "/#";
 
+    public static final int REVIEWS_LIST = 500;
+    public static final String REVIEW_URI_STRING = MovieContract.PATH_REVIEWS;
+
+    public static final int REVIEW_DETAIL = 600;
+    public static final String REVIEW_DETAIL_URI_STRING = MovieContract.PATH_REVIEWS + "/#";
+
     public static final UriMatcher sUriMatcher = buildUriMatcher();
     private MovieDbHelper mOpenHelper;
 
@@ -45,6 +51,8 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MOVIE_DETAIL_URI_STRING, MOVIE_DETAIL);
         matcher.addURI(authority, TRAILERS_URI_STRING, TRAILERS_LIST);
         matcher.addURI(authority, TRAILER_DETAIL_URI_STRING, TRAILER_DETAIL);
+        matcher.addURI(authority, REVIEW_URI_STRING, REVIEWS_LIST);
+        matcher.addURI(authority, REVIEW_DETAIL_URI_STRING, REVIEW_DETAIL);
 
         return matcher;
 
@@ -90,7 +98,6 @@ public class MovieProvider extends ContentProvider {
 
             case TRAILERS_LIST:
                 Log.d(TAG, "Query table name: " + MovieContract.MovieEntry.TRAILER_TABLE_NAME);
-                Log.d(TAG, "Query projection: " + projection);
 
                 cursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TRAILER_TABLE_NAME,
@@ -115,6 +122,35 @@ public class MovieProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
+
+            case REVIEWS_LIST:
+                Log.d(TAG, "Query table name: " + MovieContract.MovieEntry.REVIEW_TABLE_NAME);
+                Log.d(TAG, "Query projection: " + projection);
+
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.REVIEW_TABLE_NAME,
+                        projection,
+                        selection,
+                        selectArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
+            case REVIEW_DETAIL:
+                String review_ID = uri.getLastPathSegment();
+                selectArgs = new String[]{review_ID};
+
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.REVIEW_TABLE_NAME,
+                        projection,
+                        MovieContract.MovieEntry.COLUMN_REVIEW_ID + " = ? ",
+                        selectArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
 
             default:
                 throw new UnsupportedOperationException( "Uri not recognized: " + uri.toString());
@@ -185,6 +221,27 @@ public class MovieProvider extends ContentProvider {
 
                 return rowsInserted;
 
+            case REVIEWS_LIST:
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(MovieContract.MovieEntry.REVIEW_TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            rowsInserted++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                if (rowsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowsInserted;
+
             default:
                 throw new UnsupportedOperationException("Uri not recognized: " + uri.toString());
 
@@ -210,6 +267,13 @@ public class MovieProvider extends ContentProvider {
             case TRAILERS_LIST:
                 numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
                         MovieContract.MovieEntry.TRAILER_TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+
+            case REVIEWS_LIST:
+                numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
+                        MovieContract.MovieEntry.REVIEW_TABLE_NAME,
                         selection,
                         selectionArgs);
                 break;

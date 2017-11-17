@@ -36,6 +36,12 @@ public class MovieDBJsonUtils {
     public static final int TRAILER_SITE = 3;
     public static final int TRAILER_MOVIE_ID = 4;
 
+    /* Review Data Structure */
+    public static final int REVIEW_ID = 0;
+    public static final int REVIEW_AUTHOR = 1;
+    public static final int REVIEW_CONTENT = 2;
+    public static final int REVIEW_MOVID_ID = 3;
+
     /* Movie field information */
     private static final String TMD_RESULTS_LABEL = "results";
 
@@ -51,6 +57,10 @@ public class MovieDBJsonUtils {
     private static final String TRAILER_KEY_LABEL = "key";
     private static final String TRAILER_SITE_LABEL = "site";
     private static final String TRAILER_TYPE_LABEL = "trailer";
+
+    private static final String REVIEW_ID_LABEL = "id";
+    private static final String REVIEW_AUTHOR_LABEL = "author";
+    private static final String REVIEW_CONTENT_LABEL = "content";
 
     private static final String TMD_CODE_LABEL = "status_code";
     private static final String TMD_MESSAGE_LABEL = "status_message";
@@ -136,6 +146,38 @@ public class MovieDBJsonUtils {
         }
 
         return trailerCVs;
+
+    }
+
+    public static ContentValues[] getReviewContentValuesFromJson(Context context,
+                                                                  String reviewJsonStr)
+            throws JSONException {
+        JSONObject reviewJson = new JSONObject(reviewJsonStr);
+
+        if (checkResponseError(reviewJson)) throw new UnsupportedOperationException();
+
+        int movie_id = reviewJson.getInt(MOVIE_ID_LABEL);
+
+        JSONArray jsonReviewArray = reviewJson.getJSONArray(TMD_RESULTS_LABEL);
+
+        // Extra CV for Movie ID
+        ContentValues[] reviewCVs = new ContentValues[jsonReviewArray.length()];
+        for (int i = 0; i < jsonReviewArray.length(); i++) {
+            JSONObject review = jsonReviewArray.getJSONObject(i);
+            String reviewID = review.getString(REVIEW_ID_LABEL);
+            String reviewAuthor = review.getString(REVIEW_AUTHOR_LABEL);
+            String reviewContent = review.getString(REVIEW_CONTENT_LABEL);
+
+            ContentValues reviewValues = new ContentValues();
+            reviewValues.put(MovieContract.MovieEntry.COLUMN_REVIEW_ID, reviewID);
+            reviewValues.put(MovieContract.MovieEntry.COLUMN_REVIEW_AUTHOR, reviewAuthor);
+            reviewValues.put(MovieContract.MovieEntry.COLUMN_REVIEW_CONTENT, reviewContent);
+
+            reviewCVs[i] = reviewValues;
+
+        }
+
+        return reviewCVs;
 
     }
 

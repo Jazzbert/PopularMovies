@@ -1,6 +1,7 @@
 package com.craigcleveland.popularmovies;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -54,8 +55,19 @@ public class MovieDetailActivity extends AppCompatActivity implements
     public static final int INDEX_TRAILER_KEY = 1;
     public static final int INDEX_TRAILER_NAME = 2;
     
+    public static final String[] REVIEW_LIST_PROJECTION = {
+            MovieContract.MovieEntry.COLUMN_REVIEW_ID,
+            MovieContract.MovieEntry.COLUMN_REVIEW_AUTHOR,
+            MovieContract.MovieEntry.COLUMN_REVIEW_CONTENT
+    };
+
+    public static final int INDEX_REVIEW_ID = 0;
+    public static final int INDEX_REVIEW_AUTHOR = 1;
+    public static final int INDEX_REVIEW_CONTENT = 2;
+
     private static final int ID_DETAIL_LOADER = 1200;
     private static final int TRAILER_LIST_LOADER = 1300;
+    private static final int REVIEW_LIST_LOADER = 1400;
 
     private ImageView mPosterImageView;
     private TextView mMovieTitleTextView;
@@ -114,6 +126,13 @@ public class MovieDetailActivity extends AppCompatActivity implements
             loaderManager.restartLoader(TRAILER_LIST_LOADER, null, this);
         }
 
+        Loader<Cursor> reviewsLoader = loaderManager.getLoader(REVIEW_LIST_LOADER);
+        if (reviewsLoader == null) {
+            loaderManager.initLoader(REVIEW_LIST_LOADER, null, this);
+        } else {
+            loaderManager.restartLoader(REVIEW_LIST_LOADER, null, this);
+        }
+
 
     }
 
@@ -131,37 +150,58 @@ public class MovieDetailActivity extends AppCompatActivity implements
 
             case TRAILER_LIST_LOADER:
                 Log.d(TAG, "Beginning trailer load");
-                return new AsyncTaskLoader<Cursor>(this) {
-                    @Override
-                    protected void onStartLoading() {
-                        forceLoad();
-                    }
+                return new DbCursorLoader(this,
+                        MovieContract.MovieEntry.TRAILER_CONTENT_URI,
+                        TRAILER_LIST_PROJECTION);
 
-                    @Override
-                    public Cursor loadInBackground() {
-                        if (sMovieID <=0) return null;
-                        Log.d(TAG, "Getting trailer data from Internet");
-                        MovieSyncTask.syncTrailers(getContext(), sMovieID);
-                        Log.d(TAG, "Completed trailer data load");
-
-                        Uri trailerUri = MovieContract.MovieEntry.TRAILER_CONTENT_URI;
-                        Log.d(TAG, "TrailerURI: " + trailerUri.toString());
-                        ContentResolver trailerCR = getContext().getContentResolver();
-                        Cursor result = trailerCR.query(trailerUri,
-                                MovieDetailActivity.TRAILER_LIST_PROJECTION,
-                                null,
-                                null,
-                                null);
-
-                        Log.d(TAG, "Trailer Cursor rows: " + Integer.toString(result.getCount()));
-
-                        return result;
-
-                    }
-                };
+            case REVIEW_LIST_LOADER:
+                Log.d(TAG, "Beginning reviews load");
+                return new DbCursorLoader(this,
+                        MovieContract.MovieEntry.REVIEWS_CONTENT_URI,
+                        REVIEW_LIST_PROJECTION);
 
             default:
                 throw new RuntimeException("Loader Not Implemented: " + id);
+
+        }
+    }
+
+    private static class DbCursorLoader extends AsyncTaskLoader<Cursor> {
+        private Uri mContentUri;
+        private String[] mProjection;
+
+        public DbCursorLoader(Context context, Uri contentUri, String[] projection) {
+            super(context);
+            mContentUri = contentUri;
+            mProjection = projection;
+        }
+
+        @Override
+        protected void onStartLoading() {
+            forceLoad();
+        }
+
+        @Override
+        public Cursor loadInBackground() {
+            if (sMovieID <=0) return null;
+            Log.d(TAG, "Getting data for: " + mContentUri.toString());
+            if (mContentUri == MovieContract.MovieEntry.TRAILER_CONTENT_URI) {
+                MovieSyncTask.syncTrailers(getContext(), sMovieID);
+            } else {
+                MovieSyncTask.syncReviews(getContext(), sMovieID);
+            }
+            Log.d(TAG, "Completed data load for: " + mContentUri.toString());
+
+            ContentResolver contentResolver = getContext().getContentResolver();
+            Cursor result = contentResolver.query(mContentUri,
+                    mProjection,
+                    null,
+                    null,
+                    null);
+
+            Log.d(TAG, "Cursor rows: " + Integer.toString(result.getCount()));
+
+            return result;
 
         }
     }

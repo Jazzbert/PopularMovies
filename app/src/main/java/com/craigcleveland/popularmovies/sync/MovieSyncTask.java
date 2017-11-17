@@ -102,4 +102,39 @@ public class MovieSyncTask {
 
     }
 
+    synchronized public static void syncReviews(Context context, int movie_id) {
+
+        Log.d(TAG, "syncReviews has started");
+
+        try {
+            URL movieRequestUrl = NetworkUtils.buildTMDBURL(
+                    MovieProvider.REVIEWS_LIST,
+                    context.getString(R.string.tmdbAPIKey),
+                    movie_id);
+
+            String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
+
+            ContentValues[] reviewValues = MovieDBJsonUtils
+                    .getReviewContentValuesFromJson(context, jsonMovieResponse);
+
+            if (reviewValues != null && reviewValues.length != 0) {
+                ContentResolver reviewCR = context.getContentResolver();
+                int numRowsDeleted = reviewCR.delete(MovieContract.MovieEntry.REVIEWS_CONTENT_URI,
+                        null, null);
+                Log.d(TAG, "review rows deleted = " + numRowsDeleted);
+
+                int numRowsInserted = reviewCR.bulkInsert(
+                        MovieContract.MovieEntry.REVIEWS_CONTENT_URI, reviewValues);
+                Log.d(TAG, "review rows inserted = " + numRowsInserted);
+                Log.d(TAG, "inserted at URI: " + MovieContract.MovieEntry.REVIEWS_CONTENT_URI);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
 }

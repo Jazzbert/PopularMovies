@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 
 public class MovieDetailActivity extends AppCompatActivity implements
         TrailerAdapter.TrailerAdapterClickHandler,
+        ReviewAdapter.ReviewAdapaterClickHandler,
         AdapterView.OnItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -79,6 +80,10 @@ public class MovieDetailActivity extends AppCompatActivity implements
     private TrailerAdapter mTrailerAdapter;
     private int mTrailerPosition = RecyclerView.NO_POSITION;
 
+    private RecyclerView mReviewRecyclerView;
+    private ReviewAdapter mReviewAdapter;
+    private int mReviewPosition = RecyclerView.NO_POSITION;
+
     private static int sMovieID;
 
     private Uri mUri;
@@ -109,31 +114,31 @@ public class MovieDetailActivity extends AppCompatActivity implements
         mTrailerAdapter = new TrailerAdapter(this, this);
         mTrailerRecyclerView.setAdapter(mTrailerAdapter);
 
+        // Establish review layout items
+        mReviewRecyclerView = (RecyclerView) findViewById(R.id.rv_reviews);
+
+        LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this);
+        mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
+        mReviewRecyclerView.setHasFixedSize(true);
+
+        mReviewAdapter = new ReviewAdapter(this, this);
+        mReviewRecyclerView.setAdapter(mReviewAdapter);
+
         // Start data loads
         LoaderManager loaderManager = getSupportLoaderManager();
 
-        Loader<Cursor> movieDetailLoader = loaderManager.getLoader(ID_DETAIL_LOADER);
-        if (movieDetailLoader == null) {
-            loaderManager.initLoader(ID_DETAIL_LOADER, null, this);
+        runLoader(loaderManager, ID_DETAIL_LOADER, this);
+        runLoader(loaderManager, TRAILER_LIST_LOADER, this);
+        runLoader(loaderManager, REVIEW_LIST_LOADER, this);
+    }
+
+    private void runLoader(LoaderManager lm, int loaderID, LoaderManager.LoaderCallbacks callback) {
+        Loader<Cursor> loader = lm.getLoader(loaderID);
+        if (loader == null) {
+            lm.initLoader(loaderID, null, callback);
         } else {
-            loaderManager.restartLoader(ID_DETAIL_LOADER, null, this);
+            lm.restartLoader(loaderID, null, callback);
         }
-
-        Loader<Cursor> trailersLoader = loaderManager.getLoader(TRAILER_LIST_LOADER);
-        if (trailersLoader == null) {
-            loaderManager.initLoader(TRAILER_LIST_LOADER, null, this);
-        } else {
-            loaderManager.restartLoader(TRAILER_LIST_LOADER, null, this);
-        }
-
-        Loader<Cursor> reviewsLoader = loaderManager.getLoader(REVIEW_LIST_LOADER);
-        if (reviewsLoader == null) {
-            loaderManager.initLoader(REVIEW_LIST_LOADER, null, this);
-        } else {
-            loaderManager.restartLoader(REVIEW_LIST_LOADER, null, this);
-        }
-
-
     }
 
     @Override
@@ -150,13 +155,13 @@ public class MovieDetailActivity extends AppCompatActivity implements
 
             case TRAILER_LIST_LOADER:
                 Log.d(TAG, "Beginning trailer load");
-                return new DbCursorLoader(this,
+                return new NewDataCursorLoader(this,
                         MovieContract.MovieEntry.TRAILER_CONTENT_URI,
                         TRAILER_LIST_PROJECTION);
 
             case REVIEW_LIST_LOADER:
                 Log.d(TAG, "Beginning reviews load");
-                return new DbCursorLoader(this,
+                return new NewDataCursorLoader(this,
                         MovieContract.MovieEntry.REVIEWS_CONTENT_URI,
                         REVIEW_LIST_PROJECTION);
 
@@ -166,11 +171,11 @@ public class MovieDetailActivity extends AppCompatActivity implements
         }
     }
 
-    private static class DbCursorLoader extends AsyncTaskLoader<Cursor> {
+    private static class NewDataCursorLoader extends AsyncTaskLoader<Cursor> {
         private Uri mContentUri;
         private String[] mProjection;
 
-        public DbCursorLoader(Context context, Uri contentUri, String[] projection) {
+        public NewDataCursorLoader(Context context, Uri contentUri, String[] projection) {
             super(context);
             mContentUri = contentUri;
             mProjection = projection;
@@ -219,8 +224,6 @@ public class MovieDetailActivity extends AppCompatActivity implements
 
                 if (!cursorHasValidData) return;
 
-                Log.d(TAG, "Rows in detail cursor: " + data.getCount());
-
                 // Set Poster
                 String posterUrl =
                         NetworkUtils.buildPosterURL(data.getString(INDEX_MOVIE_POSTER));
@@ -238,7 +241,15 @@ public class MovieDetailActivity extends AppCompatActivity implements
                 /* Check if we have valid data in the cursor */
                 if (null == data) throw new RuntimeException("No data returned from the loader");
                 mTrailerAdapter.swapCursor(data);
+                Log.d(TAG, "Trailer data updated, total rows = " + data.getCount());
                 if (mTrailerPosition == RecyclerView.NO_POSITION) mTrailerPosition = 0;
+                break;
+
+            case REVIEW_LIST_LOADER:
+                if (null == data) throw new RuntimeException("No data returned from the loader");
+                mReviewAdapter.swapCursor(data);
+                Log.d(TAG, "Review data updated, total rows = " + data.getCount());
+                if (mReviewPosition == RecyclerView.NO_POSITION) mReviewPosition = 0;
                 break;
 
             default:

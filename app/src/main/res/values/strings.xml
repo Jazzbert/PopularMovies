@@ -29,5 +29,6 @@
     <string name="creator_email">craig.cleveland@gmail.com</string>
     <string name="trailers">Trailers</string>
     <string name="movie_poster">Movie Poster</string>
+    <string name="reviews">Reviews</string>
 
 </resources>

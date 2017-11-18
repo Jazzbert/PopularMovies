@@ -104,13 +104,14 @@ public class MovieSyncTask {
 
     synchronized public static void syncReviews(Context context, int movie_id) {
 
-        Log.d(TAG, "syncReviews has started");
+        Log.d(TAG, "syncReviews has started - really");
 
         try {
             URL movieRequestUrl = NetworkUtils.buildTMDBURL(
                     MovieProvider.REVIEWS_LIST,
                     context.getString(R.string.tmdbAPIKey),
                     movie_id);
+            Log.d(TAG, "review url: " + movieRequestUrl.toString());
 
             String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
 

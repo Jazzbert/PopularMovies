@@ -125,7 +125,6 @@ public class MovieProvider extends ContentProvider {
 
             case REVIEWS_LIST:
                 Log.d(TAG, "Query table name: " + MovieContract.MovieEntry.REVIEW_TABLE_NAME);
-                Log.d(TAG, "Query projection: " + projection);
 
                 cursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.REVIEW_TABLE_NAME,

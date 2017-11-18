@@ -40,7 +40,7 @@ public final class NetworkUtils {
             queryPath = "movie/popular";
         } else if (queryType == MovieProvider.TRAILERS_LIST) {
             queryPath = "movie/" + Integer.toString(query_id) + "/videos";
-        } else if (queryType == MovieProvider.TRAILERS_LIST) {
+        } else if (queryType == MovieProvider.REVIEWS_LIST) {
             queryPath = "movie/" + Integer.toString(query_id) + "/reviews";
         } else {
             throw new IllegalArgumentException();

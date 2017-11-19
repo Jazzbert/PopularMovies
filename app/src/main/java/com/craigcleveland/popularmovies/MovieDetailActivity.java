@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -67,8 +68,8 @@ public class MovieDetailActivity extends AppCompatActivity implements
     public static final int INDEX_REVIEW_CONTENT = 2;
 
     private static final int ID_DETAIL_LOADER = 1200;
-    private static final int TRAILER_LIST_LOADER = 1300;
-    private static final int REVIEW_LIST_LOADER = 1400;
+    public static final int TRAILER_LIST_LOADER = 1300;
+    public static final int REVIEW_LIST_LOADER = 1400;
 
     private ImageView mPosterImageView;
     private TextView mMovieTitleTextView;
@@ -91,6 +92,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_movie_detail);
         sMovieID = getIntent().getIntExtra(MovieContract.MovieEntry.COLUMN_MOVIE_ID, -1);
 
@@ -102,7 +104,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
         mSynopsisTextView = (TextView) findViewById(R.id.tv_detail_synopsis);
 
         mUri = getIntent().getData();
-        if (null == mUri) throw new NullPointerException("URI for DetailActivity cannot be null");
+        if (null == mUri  ) throw new NullPointerException("URI for DetailActivity cannot be null");
 
         // Establish trailer layout items
         mTrailerRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
@@ -273,13 +275,25 @@ public class MovieDetailActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onClick(String trailerKey) {
+    public void onClick(String trailerID) {
         Intent watchVideo = new Intent(Intent.ACTION_VIEW);
-        Uri videoUri = Uri.parse("http://www.youtube.com/embed/" + trailerKey);
+        Uri videoUri = Uri.parse("http://www.youtube.com/embed/" + trailerID);
         watchVideo.setData(videoUri);
         if (watchVideo.resolveActivity(getPackageManager()) != null) {
             startActivity(watchVideo);
         }
+    }
+
+    @Override
+    public void onClick(String reviewAuthor, String reviewContent) {
+        Intent readReview = new Intent(this, ReviewActivity.class);
+        readReview.putExtra(MovieContract.MovieEntry.COLUMN_TITLE,
+                mMovieTitleTextView.getText());
+        readReview.putExtra(MovieContract.MovieEntry.COLUMN_REVIEW_AUTHOR,
+                reviewAuthor);
+        readReview.putExtra(MovieContract.MovieEntry.COLUMN_REVIEW_CONTENT,
+                reviewContent);
+        startActivity(readReview);
     }
 
 //    public class DetailDataLoader extends AsyncTaskLoader<Void> {

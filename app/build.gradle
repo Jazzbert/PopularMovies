@@ -32,7 +32,9 @@ dependencies {
     compile 'com.android.support:support-v4:26.+'
     compile 'com.android.support:support-vector-drawable:26.+'
     testCompile 'junit:junit:4.12'
+    compile 'us.feras.mdv:markdownview:1.1.0'
 }
+
 
 
 

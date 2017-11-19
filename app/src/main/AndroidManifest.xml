@@ -19,8 +19,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MovieDetailActivity"
-            android:label="Movie Detail">
+        <activity
+            android:name=".MovieDetailActivity"
+            android:label="Movie Detail"
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -41,9 +43,16 @@
             android:authorities="@string/content_authority"
             android:exported="false" />
 
-        <service android:name=".sync.MovieSyncIntentService"
+        <service
+            android:name=".sync.MovieSyncIntentService"
             android:exported="false" />
 
+        <activity android:name=".ReviewActivity"
+            android:label="Movie Review">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MovieDetailActivity" />
+        </activity>
     </application>
 
 </manifest>

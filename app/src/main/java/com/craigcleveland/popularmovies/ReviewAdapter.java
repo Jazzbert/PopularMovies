@@ -24,7 +24,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
     private Cursor mCursor;
 
     public interface ReviewAdapaterClickHandler {
-        void onClick(String reviewContent);
+        void onClick(String reviewAuthor, String reviewContent);
     }
 
     public ReviewAdapter(@NonNull Context context, ReviewAdapaterClickHandler clickHandler) {
@@ -47,7 +47,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
         public void onClick(View v) {
             int adapaterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapaterPosition);
-            mClickHandler.onClick(mCursor.getString(MovieDetailActivity.INDEX_REVIEW_CONTENT));
+            mClickHandler.onClick(mCursor.getString(MovieDetailActivity.INDEX_REVIEW_AUTHOR),
+                    mCursor.getString(MovieDetailActivity.INDEX_REVIEW_CONTENT));
         }
 
     }

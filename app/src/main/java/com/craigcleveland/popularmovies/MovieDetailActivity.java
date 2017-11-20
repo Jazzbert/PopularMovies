@@ -25,6 +25,10 @@ import com.craigcleveland.popularmovies.sync.MovieSyncTask;
 import com.craigcleveland.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MovieDetailActivity extends AppCompatActivity implements
         TrailerAdapter.TrailerAdapterClickHandler,
         ReviewAdapter.ReviewAdapaterClickHandler,
@@ -231,10 +235,22 @@ public class MovieDetailActivity extends AppCompatActivity implements
                         NetworkUtils.buildPosterURL(data.getString(INDEX_MOVIE_POSTER));
                 Picasso.with(this).load(posterUrl).into(mPosterImageView);
 
+                // Format and set release date
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date relDate = null;
+                Log.d(TAG, "Date trying to format: " + data.getString(INDEX_MOVIE_RELEASE_DATE));
+                try {
+                    relDate = sdf.parse(data.getString(INDEX_MOVIE_RELEASE_DATE));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                java.text.DateFormat df =
+                        android.text.format.DateFormat.getMediumDateFormat(this);
+                mReleaseDateTextView.setText(df.format(relDate));
+
                 // Set Remaining Text Items
                 mMovieTitleTextView.setText(data.getString(INDEX_MOVIE_TITLE));
-                mReleaseDateTextView.setText(data.getString(INDEX_MOVIE_RELEASE_DATE));
-                mUserRatingTextView.setText(data.getString(INDEX_MOVIE_RATING));
+                mUserRatingTextView.setText(data.getString(INDEX_MOVIE_RATING) + " / 10");
                 mSynopsisTextView.setText(data.getString(INDEX_MOVIE_SYNOPSIS));
 
                 break;

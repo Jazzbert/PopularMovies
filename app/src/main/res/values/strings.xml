@@ -30,5 +30,6 @@
     <string name="trailers">Trailers</string>
     <string name="movie_poster">Movie Poster</string>
     <string name="reviews">Reviews</string>
+    <string name="favorite">Favorite</string>
 
 </resources>

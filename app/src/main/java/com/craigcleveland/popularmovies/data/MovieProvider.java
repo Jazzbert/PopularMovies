@@ -4,7 +4,6 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -25,7 +24,9 @@ public class MovieProvider extends ContentProvider {
     public static final int MOST_POPULAR = 101;
     public static final int TOP_RATED = 102;
     public static final int FAVORITES = 103;
+
     public static final String MOVIES_URI_STRING = MovieContract.PATH_MOVIE;
+    public static final String FAVORITES_URI_STRING = MovieContract.PATH_FAVORITES;
 
     public static final int MOVIE_DETAIL = 200;
     public static final String MOVIE_DETAIL_URI_STRING = MovieContract.PATH_MOVIE + "/#";
@@ -55,6 +56,7 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, TRAILER_DETAIL_URI_STRING, TRAILER_DETAIL);
         matcher.addURI(authority, REVIEW_URI_STRING, REVIEWS_LIST);
         matcher.addURI(authority, REVIEW_DETAIL_URI_STRING, REVIEW_DETAIL);
+        matcher.addURI(authority, FAVORITES_URI_STRING, FAVORITES);
 
         return matcher;
 
@@ -171,7 +173,25 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        return null;
+
+        switch (sUriMatcher.match(uri)) {
+            case FAVORITES:
+                SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+                long _id = db.insert(MovieContract.MovieEntry.FAVORITES_TABLE_NAME,
+                        null,
+                        contentValues);
+                if (_id == -1) {
+                    Log.e(TAG, "Unable to make DB insert, URI: " + uri.toString());
+                }
+
+                Log.d(TAG, "Favorite row inserted at " + _id);
+
+                return null;
+
+            default:
+                throw new UnsupportedOperationException("Uri not recognized: " + uri.toString());
+        }
+
     }
 
     @Override
@@ -277,6 +297,14 @@ public class MovieProvider extends ContentProvider {
                         MovieContract.MovieEntry.REVIEW_TABLE_NAME,
                         selection,
                         selectionArgs);
+                break;
+
+            case FAVORITES:
+                numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
+                        MovieContract.MovieEntry.FAVORITES_TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                Log.d(TAG, "Favorite rows deleted: " + numRowsDeleted);
                 break;
 
             default:

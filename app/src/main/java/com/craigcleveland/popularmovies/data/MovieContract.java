@@ -17,6 +17,7 @@ public class MovieContract {
     public static final String PATH_TOP_RATED = "movie/top_rated";
     public static final String PATH_TRAILERS = "videos";
     public static final String PATH_REVIEWS = "reviews";
+    public static final String PATH_FAVORITES = "favorites";
 
     public static final class MovieEntry implements BaseColumns {
         public static final Uri MOVIE_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
@@ -29,6 +30,8 @@ public class MovieContract {
                 .appendPath(PATH_POPULAR).build();
         public static final Uri TOP_RATED_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_TOP_RATED).build();
+        public static final Uri FAVORITE_MOVIE_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_FAVORITES).build();
 
         /* Movie Table */
         public static final String MOVIE_TABLE_NAME = "movie";
@@ -59,7 +62,6 @@ public class MovieContract {
 
         /* Movies View (for use in joined table query) */
         public static final String MOVIE_VIEW_NAME = "movie_view";
-        public static final String COLUMN_ISFAVORITE = "isfavorite";
 
         public static Uri buildMovieDetailUri(int movieID) {
             return MOVIE_CONTENT_URI.buildUpon()

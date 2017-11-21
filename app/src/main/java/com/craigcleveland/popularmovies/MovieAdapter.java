@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.craigcleveland.popularmovies.utilities.MovieDBJsonUtils;
 import com.craigcleveland.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 

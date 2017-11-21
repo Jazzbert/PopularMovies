@@ -1,6 +1,7 @@
 package com.craigcleveland.popularmovies;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -120,11 +121,8 @@ public class MovieDetailActivity extends AppCompatActivity implements
         mFavoriteToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    // Flag movie as a favorite to the movie provider
-                } else {
-                    // Remove favorite flag with the movie provider
-                }
+                // Update the provider based on if favorite is checked or not
+                updateFavoriteMovie(sMovieID, isChecked);
             }
         });
 
@@ -335,6 +333,22 @@ public class MovieDetailActivity extends AppCompatActivity implements
         readReview.putExtra(MovieContract.MovieEntry.COLUMN_REVIEW_CONTENT,
                 reviewContent);
         startActivity(readReview);
+    }
+
+
+    private void updateFavoriteMovie (int movieID, boolean isFavorite) {
+        if (isFavorite) {
+            ContentValues cv = new ContentValues();
+            cv.put(MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID, movieID);
+            this.getContentResolver().insert(
+                    MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
+                    cv);
+        } else {
+            this.getContentResolver().delete(
+                    MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
+                    MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID + " = ?",
+                    new String[] {Integer.toString(movieID)});
+        }
     }
 
 //    public class DetailDataLoader extends AsyncTaskLoader<Void> {

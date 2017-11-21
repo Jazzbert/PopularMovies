@@ -17,8 +17,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.craigcleveland.popularmovies.data.MovieContract;
 import com.craigcleveland.popularmovies.sync.MovieSyncTask;
@@ -43,6 +45,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_RATING,
             MovieContract.MovieEntry.COLUMN_SYNOPSIS,
+            MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID
     };
 
     public static final int INDEX_MOVIE_POSTER = 0;
@@ -50,6 +53,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
     public static final int INDEX_MOVIE_RELEASE_DATE = 2;
     public static final int INDEX_MOVIE_RATING = 3;
     public static final int INDEX_MOVIE_SYNOPSIS = 4;
+    public static final int INDEX_MOVIE_FAVORITE_ID = 5;
     
     public static final String[] TRAILER_LIST_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_TRAILER_ID,
@@ -80,6 +84,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
     private TextView mReleaseDateTextView;
     private TextView mUserRatingTextView;
     private TextView mSynopsisTextView;
+    private ToggleButton mFavoriteToggleButton;
 
     private RecyclerView mTrailerRecyclerView;
     private TrailerAdapter mTrailerAdapter;
@@ -106,9 +111,22 @@ public class MovieDetailActivity extends AppCompatActivity implements
         mReleaseDateTextView = (TextView) findViewById(R.id.tv_detail_release_date);
         mUserRatingTextView = (TextView) findViewById(R.id.tv_detail_user_rating);
         mSynopsisTextView = (TextView) findViewById(R.id.tv_detail_synopsis);
+        mFavoriteToggleButton = (ToggleButton) findViewById(R.id.tb_favorite);
 
         mUri = getIntent().getData();
         if (null == mUri  ) throw new NullPointerException("URI for DetailActivity cannot be null");
+
+        // Set toggle button change listener
+        mFavoriteToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // Flag movie as a favorite to the movie provider
+                } else {
+                    // Remove favorite flag with the movie provider
+                }
+            }
+        });
 
         // Establish trailer layout items
         mTrailerRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
@@ -247,6 +265,13 @@ public class MovieDetailActivity extends AppCompatActivity implements
                 java.text.DateFormat df =
                         android.text.format.DateFormat.getMediumDateFormat(this);
                 mReleaseDateTextView.setText(df.format(relDate));
+
+                //Set Favorite flag if necessary
+                if (data.getInt(INDEX_MOVIE_FAVORITE_ID) > 0)  {
+                    mFavoriteToggleButton.setChecked(true);
+                } else {
+                    mFavoriteToggleButton.setChecked(false);
+                }
 
                 // Set Remaining Text Items
                 mMovieTitleTextView.setText(data.getString(INDEX_MOVIE_TITLE));

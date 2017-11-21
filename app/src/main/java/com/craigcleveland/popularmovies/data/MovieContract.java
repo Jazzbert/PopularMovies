@@ -52,6 +52,14 @@ public class MovieContract {
         public static final String COLUMN_REVIEW_AUTHOR = "review_author";
         public static final String COLUMN_REVIEW_CONTENT = "review_content";
 
+        /* Favorite Movies Table */
+        public static final String FAVORITES_TABLE_NAME = "favorites";
+        public static final String COLUMN_FAVORITES_ID = "favorites_id";
+        public static final String COLUMN_FAV_MOVIE_ID = "fav_movie_id";
+
+        /* Movies View (for use in joined table query) */
+        public static final String MOVIE_VIEW_NAME = "movie_view";
+        public static final String COLUMN_ISFAVORITE = "isfavorite";
 
         public static Uri buildMovieDetailUri(int movieID) {
             return MOVIE_CONTENT_URI.buildUpon()

@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -23,6 +24,7 @@ public class MovieProvider extends ContentProvider {
     public static final int MOVIE_LIST = 100;
     public static final int MOST_POPULAR = 101;
     public static final int TOP_RATED = 102;
+    public static final int FAVORITES = 103;
     public static final String MOVIES_URI_STRING = MovieContract.PATH_MOVIE;
 
     public static final int MOVIE_DETAIL = 200;
@@ -87,7 +89,7 @@ public class MovieProvider extends ContentProvider {
                 selectArgs = new String[]{movie_ID};
 
                 cursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.MOVIE_TABLE_NAME,
+                        MovieContract.MovieEntry.MOVIE_VIEW_NAME,
                         projection,
                         MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ",
                         selectArgs,

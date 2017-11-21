@@ -96,6 +96,11 @@ public class MovieDetailActivity extends AppCompatActivity implements
     private int mReviewPosition = RecyclerView.NO_POSITION;
 
     private static int sMovieID;
+    private static String sTitle;
+    private static String sPoster;
+    private static String sReleaseDate;
+    private static String sRating;
+    private static String sSynopsis;
 
     private Uri mUri;
 
@@ -246,17 +251,23 @@ public class MovieDetailActivity extends AppCompatActivity implements
 
                 if (!cursorHasValidData) return;
 
+                sTitle = data.getString(INDEX_MOVIE_TITLE);
+                sPoster = data.getString(INDEX_MOVIE_POSTER);
+                sReleaseDate = data.getString(INDEX_MOVIE_RELEASE_DATE);
+                sRating = data.getString(INDEX_MOVIE_RATING);
+                sSynopsis = data.getString(INDEX_MOVIE_SYNOPSIS);
+
                 // Set Poster
                 String posterUrl =
-                        NetworkUtils.buildPosterURL(data.getString(INDEX_MOVIE_POSTER));
+                        NetworkUtils.buildPosterURL(sPoster);
                 Picasso.with(this).load(posterUrl).into(mPosterImageView);
 
                 // Format and set release date
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 Date relDate = null;
-                Log.d(TAG, "Date trying to format: " + data.getString(INDEX_MOVIE_RELEASE_DATE));
+                Log.d(TAG, "Date trying to format: " + sReleaseDate);
                 try {
-                    relDate = sdf.parse(data.getString(INDEX_MOVIE_RELEASE_DATE));
+                    relDate = sdf.parse(sReleaseDate);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -264,7 +275,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
                         android.text.format.DateFormat.getMediumDateFormat(this);
                 mReleaseDateTextView.setText(df.format(relDate));
 
-                //Set Favorite flag if necessary
+                //Set Favorite flag
                 if (data.getInt(INDEX_MOVIE_FAVORITE_ID) > 0)  {
                     mFavoriteToggleButton.setChecked(true);
                 } else {
@@ -272,9 +283,9 @@ public class MovieDetailActivity extends AppCompatActivity implements
                 }
 
                 // Set Remaining Text Items
-                mMovieTitleTextView.setText(data.getString(INDEX_MOVIE_TITLE));
-                mUserRatingTextView.setText(data.getString(INDEX_MOVIE_RATING) + " / 10");
-                mSynopsisTextView.setText(data.getString(INDEX_MOVIE_SYNOPSIS));
+                mMovieTitleTextView.setText(sTitle);
+                mUserRatingTextView.setText(sRating + " / 10");
+                mSynopsisTextView.setText(sSynopsis);
 
                 break;
 
@@ -336,19 +347,30 @@ public class MovieDetailActivity extends AppCompatActivity implements
     }
 
 
-    private void updateFavoriteMovie (int movieID, boolean isFavorite) {
-        if (isFavorite) {
-            ContentValues cv = new ContentValues();
-            cv.put(MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID, movieID);
-            this.getContentResolver().insert(
-                    MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
-                    cv);
-        } else {
-            this.getContentResolver().delete(
-                    MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
-                    MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID + " = ?",
-                    new String[] {Integer.toString(movieID)});
-        }
+    private void updateFavoriteMovie (final int movieID, final boolean isFavorite) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (isFavorite) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID, movieID);
+                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_TITLE, sTitle);
+                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_POSTER, sPoster);
+                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_RELEASE_DATE, sReleaseDate);
+                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_RATING, sRating);
+                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_SYNOPSIS, sSynopsis);
+                    getContentResolver().insert(
+                            MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
+                            cv);
+                } else {
+                    getContentResolver().delete(
+                            MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
+                            MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID + " = ?",
+                            new String[] {Integer.toString(movieID)});
+                }
+
+            }
+        }).start();
     }
 
 //    public class DetailDataLoader extends AsyncTaskLoader<Void> {

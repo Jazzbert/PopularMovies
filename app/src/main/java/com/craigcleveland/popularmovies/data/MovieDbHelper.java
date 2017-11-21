@@ -17,7 +17,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "movie.db";
 
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     public MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -58,6 +58,11 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + MovieEntry.FAVORITES_TABLE_NAME + " (" +
                 MovieEntry._ID                  + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 MovieEntry.COLUMN_FAV_MOVIE_ID  + " INTEGER NOT NULL, " +
+                MovieEntry.COLUMN_FAV_TITLE     + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_FAV_POSTER    + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_FAV_RATING    + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_FAV_RELEASE_DATE + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_FAV_SYNOPSIS  + " TEXT NOT NULL, " +
                 "UNIQUE (" + MovieEntry.COLUMN_FAV_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_MOVIE_VIEW =
@@ -73,20 +78,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 "LEFT JOIN " + MovieEntry.FAVORITES_TABLE_NAME + " ON " +
                 MovieEntry.FAVORITES_TABLE_NAME + "." + MovieEntry.COLUMN_FAV_MOVIE_ID + " = " +
                 MovieEntry.MOVIE_TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + ";";
-
-//        " (" +
-//                MovieEntry.COLUMN_MOVIE_ID      + ", " +
-//                MovieEntry.COLUMN_TRAILER_ID    + ", " +
-//                MovieEntry.COLUMN_TRAILER_NAME  + ", " +
-//                MovieEntry.COLUMN_TRAILER_KEY   + ", " +
-//                MovieEntry.COLUMN_FAVORITES_ID  +
-
-//        MovieEntry.COLUMN_FAVORITES_ID  + ") AS " +
-//        MovieEntry.FAVORITES_TABLE_NAME + "." + MovieEntry._ID + " " +
-
-//        MovieEntry.COLUMN_ISFAVORITE  + ") AS " +
-//                "ifnull(min(1, " +
-//                MovieEntry.FAVORITES_TABLE_NAME + "." + MovieEntry._ID + "), 0) " +
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_TRAILERS_TABLE);

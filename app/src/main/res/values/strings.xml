@@ -1,14 +1,41 @@
 <resources>
+    <!-- General strings -->
     <string name="app_name">Popular Movies</string>
     <string name="movie_poster_desc">Movie Poster</string>
     <string name="network_error_message">An error has occurred fetching data. Check network availability.</string>
     <string name="movie_title">Movie Title</string>
-    <string name="user_rating">User rating:</string>
-    <string name="release_date">Release date:</string>
-    <string name="synopsis">Synopsis:</string>
     <string name="about">About</string>
-    <string-array name="sort_order_array">
+    <string name="content_authority">com.craigcleveland.popularmovies</string>
+
+    <!-- Strings related to Settings -->
+    <string name="settings">Settings</string>
+    <string name="pref_sort_order">Sort order</string>
+    <string-array name="pref_sort_order_entries">
         <item>Most Popular</item>
         <item>Highest Rated</item>
+        <item>My Favorites</item>
     </string-array>
+    <string name="pref_sort_order_key">pref_sort_order</string>
+    <string name="pref_sort_order_default">0</string>
+    <string-array name="pref_sort_order_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- Strings for About Activity -->
+    <string name="app_created_by">App created by</string>
+    <string name="craig_cleveland">Craig Cleveland</string>
+    <string name="app_purpose">PopularMovies was completed as a project\n for Udacity Android Nanodegree</string>
+    <string name="tmdb_credit">Content for this application is\n provided by TheMovieDB.com</string>
+    <string name="creator_email">craig.cleveland@gmail.com</string>
+    <string name="trailers">Trailers</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="reviews">Reviews</string>
+    <string name="favorite">Favorite</string>
+    <string name="no_favorites_selected">No favorites selected</string>
+    <string name="review_icon">Review Icon</string>
+    <string name="trailer_icon">Trailer Icon</string>
+    <string name="review_by">Review by</string>
+
 </resources>

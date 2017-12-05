@@ -3,15 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     android:orientation="vertical"
-    tools:context="com.craigcleveland.popularmovies.MainActivity">
-
-    <Spinner
-        android:id="@+id/spinner_sort_order"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </Spinner>
+    tools:context="com.craigcleveland.popularmovies.MainActivity"
+    tools:ignore="Overdraw" > <!-- re:ignore - background color is required -->
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_main"
@@ -22,7 +17,20 @@
         android:id="@+id/tv_error_message_display"
         android:padding="16dp"
         android:text="@string/network_error_message"
+        android:layout_gravity="center"
         android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tv_no_favorites_message"
+        android:padding="16dp"
+        android:text="@string/no_favorites_selected"
+        android:layout_gravity="center"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
         android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

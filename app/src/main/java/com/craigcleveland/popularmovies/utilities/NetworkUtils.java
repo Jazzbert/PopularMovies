@@ -3,7 +3,7 @@ package com.craigcleveland.popularmovies.utilities;
 import android.net.Uri;
 import android.util.Log;
 
-import com.craigcleveland.popularmovies.MainActivity;
+import com.craigcleveland.popularmovies.data.MovieProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,25 +14,35 @@ import java.util.Scanner;
 
 public final class NetworkUtils {
 
+    // Tag for logging
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
+    // Base URL for all TMDB queries
     private static final String MOVIE_DB_URL =
             "http://api.themoviedb.org/3";
 
     private static final String API_PARAM = "api_key";  // Keeping global for future use.
 
     /**
-     *  Builds the URL used to talk to The Movie DB.  For now just returns popular results
+     *  Builds the URL used to talk to The Movie DB.
      *
      * @return The URL to use to query the weather server
      */
-    public static URL buildUrl(int sortType, String api_key) {
+    public static URL buildTMDBURL(int queryType, String api_key, int query_id) {
+
+        Log.d(TAG, "TMDB queryType: " + queryType);
 
         String queryPath;
-        if (sortType == MainActivity.HIGHEST_RATED) {
+        if (queryType == MovieProvider.TOP_RATED) {
             queryPath = "movie/top_rated";
-        } else {
+        } else if (queryType == MovieProvider.MOST_POPULAR) {
             queryPath = "movie/popular";
+        } else if (queryType == MovieProvider.TRAILERS_LIST) {
+            queryPath = "movie/" + Integer.toString(query_id) + "/videos";
+        } else if (queryType == MovieProvider.REVIEWS_LIST) {
+            queryPath = "movie/" + Integer.toString(query_id) + "/reviews";
+        } else {
+            throw new IllegalArgumentException();
         }
 
         Uri builtUri = Uri.parse(MOVIE_DB_URL).buildUpon()
@@ -40,10 +50,13 @@ public final class NetworkUtils {
                 .appendQueryParameter(API_PARAM, api_key)
                 .build();
 
+        Log.d(TAG, "TMDB URL: " + builtUri.toString());
+
         URL url = null;
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
+            // This would be caused by coding error and should cause crash
             e.printStackTrace();
         }
 

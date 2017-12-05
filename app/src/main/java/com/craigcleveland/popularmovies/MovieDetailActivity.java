@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Movie;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -21,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.craigcleveland.popularmovies.data.MovieContract;
@@ -122,10 +122,17 @@ public class MovieDetailActivity extends AppCompatActivity implements
         mUri = getIntent().getData();
         if (null == mUri  ) throw new NullPointerException("URI for DetailActivity cannot be null");
 
+        Toast.makeText(this,
+                "Uri for movie intent: " + mUri.toString(),
+                Toast.LENGTH_LONG).show();
+
         // Set toggle button change listener
         mFavoriteToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Toast.makeText(MovieDetailActivity.this,
+                        "Updating Movie ID: " + sMovieID,
+                        Toast.LENGTH_LONG).show();
                 // Update the provider based on if favorite is checked or not
                 updateFavoriteMovie(sMovieID, isChecked);
             }
@@ -347,25 +354,26 @@ public class MovieDetailActivity extends AppCompatActivity implements
     }
 
 
-    private void updateFavoriteMovie (final int movieID, final boolean isFavorite) {
+    private void updateFavoriteMovie(final int movieID, final boolean isFavorite) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 if (isFavorite) {
                     ContentValues cv = new ContentValues();
+                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieID);
                     cv.put(MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID, movieID);
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_TITLE, sTitle);
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_POSTER, sPoster);
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_RELEASE_DATE, sReleaseDate);
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_RATING, sRating);
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAV_SYNOPSIS, sSynopsis);
+                    cv.put(MovieContract.MovieEntry.COLUMN_TITLE, sTitle);
+                    cv.put(MovieContract.MovieEntry.COLUMN_POSTER, sPoster);
+                    cv.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, sReleaseDate);
+                    cv.put(MovieContract.MovieEntry.COLUMN_RATING, sRating);
+                    cv.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, sSynopsis);
                     getContentResolver().insert(
                             MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
                             cv);
                 } else {
                     getContentResolver().delete(
                             MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
-                            MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID + " = ?",
+                            MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
                             new String[] {Integer.toString(movieID)});
                 }
 

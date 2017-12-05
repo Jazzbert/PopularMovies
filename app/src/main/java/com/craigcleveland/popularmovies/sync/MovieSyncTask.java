@@ -32,9 +32,13 @@ public class MovieSyncTask {
 
         Log.d(TAG, "Sort preference retrieved: " + sort_pref);
 
-        int sortType = MovieProvider.MOST_POPULAR;
-        if (sort_pref.equals("1")) {
+        int sortType;
+        if (sort_pref.equals("0")) {
+            sortType = MovieProvider.MOST_POPULAR;
+        } else if (sort_pref.equals("1")) {
             sortType = MovieProvider.TOP_RATED;
+        } else {
+            return;  // No sync needed for Favorites
         }
 
         try {

@@ -28,7 +28,7 @@ public class MovieSyncUtils {
             public void run() {
                 Uri movieQueryUri = MovieContract.MovieEntry.MOVIE_CONTENT_URI;
 
-                String[] projectionColumns = {MovieContract.MovieEntry._ID};
+                String[] projectionColumns = {MovieContract.MovieEntry.COLUMN_MOVIE_ID};
 
                 Cursor cursor = context.getContentResolver().query(
                         movieQueryUri,

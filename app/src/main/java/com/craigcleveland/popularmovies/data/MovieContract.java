@@ -57,20 +57,19 @@ public class MovieContract {
 
         /* Favorite Movies Table */
         public static final String FAVORITES_TABLE_NAME = "favorites";
-        public static final String COLUMN_FAVORITES_ID = "favorites_id";
         public static final String COLUMN_FAV_MOVIE_ID = "fav_movie_id";
-        public static final String COLUMN_FAV_TITLE = "fav_title";
-        public static final String COLUMN_FAV_POSTER = "fav_poster";
-        public static final String COLUMN_FAV_RATING = "fav_rating";
-        public static final String COLUMN_FAV_RELEASE_DATE = "fav_release_date";
-        public static final String COLUMN_FAV_SYNOPSIS = "fav_synopsis";
 
         /* Movies View (for use in joined table query) */
         public static final String MOVIE_VIEW_NAME = "movie_view";
 
-        public static Uri buildMovieDetailUri(int movieID) {
-            return MOVIE_CONTENT_URI.buildUpon()
-                    .appendPath(Integer.toString(movieID)).build();
+        public static Uri buildMovieDetailUri(int movieID, int sortType) {
+            if (sortType == 2) {
+                return FAVORITE_MOVIE_URI.buildUpon()
+                        .appendPath(Integer.toString(movieID)).build();
+            } else {
+                return MOVIE_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(movieID)).build();
+            }
         }
 
         public static Uri buildTrailerListUri(int movieID) {

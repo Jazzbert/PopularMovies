@@ -17,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -30,13 +29,13 @@ import com.craigcleveland.popularmovies.sync.MovieSyncUtils;
  */
 public class MainActivity extends AppCompatActivity implements
         MovieAdapter.MovieAdapterClickHandler,
-        AdapterView.OnItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final String TAG = "TMPDEBUG" + MainActivity.class.getSimpleName();
+    private final String TAG = "CCDEBUG" + MainActivity.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
+    private MovieAdapter mFavMovieAdapater;
     private int mPosition = RecyclerView.NO_POSITION;
 
     private TextView mErrorMessageDisplay;
@@ -48,11 +47,18 @@ public class MainActivity extends AppCompatActivity implements
             MovieContract.MovieEntry.COLUMN_POSTER
     };
 
+    public static final String[] FAV_MOVIE_LIST_PROJECTION = {
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_TITLE,
+            MovieContract.MovieEntry.COLUMN_POSTER
+    };
+
     public static final int INDEX_MOVIE_ID = 0;
     public static final int INDEX_MOVIE_TITLE = 1;
     public static final int INDEX_MOVIE_POSTER = 2;
 
     private static final int ID_MOVIE_LOADER = 100;
+    private static final int ID_FAV_MOVIE_LOADER = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,13 +83,14 @@ public class MainActivity extends AppCompatActivity implements
         mMovieAdapter = new MovieAdapter(this, this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
-
-        showLoading();
-
-        MovieSyncUtils.initialize(this);
-
-        showMovieDataView();
+        if (getSortType() == 2) {
+            getSupportLoaderManager().initLoader(ID_FAV_MOVIE_LOADER, null, this);
+        } else {
+            getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
+            showLoading();
+            MovieSyncUtils.initialize(this);
+            showMovieDataView();
+        }
 
     }
 
@@ -108,35 +115,28 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 return super.onOptionsItemSelected(item);
 
-
         }
     }
 
     /*
-             * This method re-loads movie data based on change in sort-type spinner.  It is
-             * required by AdapterView.OnItemSelectedListener.
-             */
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        loadMovieData();
-    }
-
-    /*
-     * Method required by AdapterView.OnItemSelectedListener
+     * This method re-loads movie data based on change in sort-type spinner.  It is
+     * required by AdapterView.OnItemSelectedListener.
      */
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Do nothing
-    }
 
-    /*
-     * This method shows gets URL for the movie list query and starts the async task to
-     * fetch the data and populate the adapter.
-     */
-    private void loadMovieData() {
-        int sortType = getSortType();
-
-        showMovieDataView();
-
-
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume was run");
+        if (getSortType() == 2) {
+            getSupportLoaderManager().initLoader(ID_FAV_MOVIE_LOADER, null, this);
+            //mRecyclerView.swapAdapter(mMovieAdapter, true);
+        } else {
+            getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
+            showLoading();
+            MovieSyncUtils.initialize(this);
+            showMovieDataView();
+            //mRecyclerView.swapAdapter(mMovieAdapter, true);
+        }
+        super.onResume();
     }
 
     private int getSortType() {
@@ -147,13 +147,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onClick(int movieID) {
+        Log.d(TAG, "click received for movieID: " + movieID);
         Class destinationClass = MovieDetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(this, destinationClass);
-        Uri uriForMovieClicked = MovieContract.MovieEntry.buildMovieDetailUri(movieID);
+        Uri uriForMovieClicked = MovieContract.MovieEntry.buildMovieDetailUri(movieID, getSortType());
         intentToStartDetailActivity.setData(uriForMovieClicked);
         intentToStartDetailActivity.putExtra(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieID);
         startActivity(intentToStartDetailActivity);
-
     }
 
     /* This method hides the error message and displays movie poster grid. */
@@ -183,13 +183,17 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (loaderId) {
             case ID_MOVIE_LOADER:
-                Uri movieQueryUri = MovieContract.MovieEntry.MOVIE_CONTENT_URI;
-
-                Log.d(TAG, "MovieQueryUri: " + movieQueryUri.toString());
-
                 return new CursorLoader(this,
-                        movieQueryUri,
+                        MovieContract.MovieEntry.MOVIE_CONTENT_URI,
                         MOVIE_LIST_PROJECTION,
+                        null,
+                        null,
+                        null);
+
+            case ID_FAV_MOVIE_LOADER:
+                return new CursorLoader(this,
+                        MovieContract.MovieEntry.FAVORITE_MOVIE_URI,
+                        FAV_MOVIE_LIST_PROJECTION,
                         null,
                         null,
                         null);
@@ -200,10 +204,13 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (null == data) throw new RuntimeException("No data returned from the loader");
         mMovieAdapter.swapCursor(data);
+        mMovieAdapter.notifyDataSetChanged();
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
         if (data.getCount() != 0) showMovieDataView();
@@ -212,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mMovieAdapter.swapCursor(null);
+        mMovieAdapter.notifyDataSetChanged();
     }
 
 }

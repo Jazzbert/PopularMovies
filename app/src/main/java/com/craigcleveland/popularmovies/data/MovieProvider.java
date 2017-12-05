@@ -31,6 +31,9 @@ public class MovieProvider extends ContentProvider {
     public static final int MOVIE_DETAIL = 200;
     public static final String MOVIE_DETAIL_URI_STRING = MovieContract.PATH_MOVIE + "/#";
 
+    public static final int FAV_DETAIL = 201;
+    public static final String FAV_DETAIL_URI_STRING = MovieContract.PATH_FAVORITES + "/#";
+
     public static final int TRAILERS_LIST = 300;
     public static final String TRAILERS_URI_STRING = MovieContract.PATH_TRAILERS;
 
@@ -57,6 +60,7 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, REVIEW_URI_STRING, REVIEWS_LIST);
         matcher.addURI(authority, REVIEW_DETAIL_URI_STRING, REVIEW_DETAIL);
         matcher.addURI(authority, FAVORITES_URI_STRING, FAVORITES);
+        matcher.addURI(authority, FAV_DETAIL_URI_STRING, FAV_DETAIL);
 
         return matcher;
 
@@ -77,7 +81,18 @@ public class MovieProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case MOVIE_LIST:
                 cursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.MOVIE_TABLE_NAME,
+                        MovieContract.MovieEntry.MOVIE_VIEW_NAME,
+                        projection,
+                        selection,
+                        selectArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
+            case FAVORITES:
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.FAVORITES_TABLE_NAME,
                         projection,
                         selection,
                         selectArgs,
@@ -87,8 +102,7 @@ public class MovieProvider extends ContentProvider {
                 break;
 
             case MOVIE_DETAIL:
-                String movie_ID = uri.getLastPathSegment();
-                selectArgs = new String[]{movie_ID};
+                selectArgs = new String[]{uri.getLastPathSegment()};
 
                 cursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.MOVIE_VIEW_NAME,
@@ -98,7 +112,28 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
+
+                // I believe this is necessary because of switching URIs on the cursor for
+                // the same recycler view.
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
                 break;
+
+            case FAV_DETAIL:
+                selectArgs = new String[]{uri.getLastPathSegment()};
+
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.FAVORITES_TABLE_NAME,
+                        projection,
+                        MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ",
+                        selectArgs,
+                        null,
+                        null,
+                        sortOrder);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+                break;
+
 
             case TRAILERS_LIST:
                 Log.d(TAG, "Query table name: " + MovieContract.MovieEntry.TRAILER_TABLE_NAME);
@@ -138,6 +173,11 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
+
+                // I believe this is necessary because of switching URIs on the cursor for
+                // the same recycler view.
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
                 break;
 
             case REVIEW_DETAIL:

@@ -122,17 +122,10 @@ public class MovieDetailActivity extends AppCompatActivity implements
         mUri = getIntent().getData();
         if (null == mUri  ) throw new NullPointerException("URI for DetailActivity cannot be null");
 
-        Toast.makeText(this,
-                "Uri for movie intent: " + mUri.toString(),
-                Toast.LENGTH_LONG).show();
-
         // Set toggle button change listener
         mFavoriteToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Toast.makeText(MovieDetailActivity.this,
-                        "Updating Movie ID: " + sMovieID,
-                        Toast.LENGTH_LONG).show();
                 // Update the provider based on if favorite is checked or not
                 updateFavoriteMovie(sMovieID, isChecked);
             }

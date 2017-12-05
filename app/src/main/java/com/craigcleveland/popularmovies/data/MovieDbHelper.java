@@ -13,7 +13,7 @@ import com.craigcleveland.popularmovies.data.MovieContract.MovieEntry;
 
 public class MovieDbHelper extends SQLiteOpenHelper {
 
-    private final String TAG = "CCDEBUG" + MovieDbHelper.class.getSimpleName();
+    private final String TAG = MovieDbHelper.class.getSimpleName();
 
     public static final String DATABASE_NAME = "movie.db";
 
@@ -88,9 +88,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_FAVORITES_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_VIEW);
 
-        Log.d(TAG, "Finished running DB Updates");
-
-
     }
 
     @Override
@@ -103,8 +100,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         // enhancement may include code to retain current favorites during DB changes.
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.FAVORITES_TABLE_NAME);
         onCreate(sqLiteDatabase);
-
-        Log.d(TAG, "Finished cleaning up old DB version");
 
     }
 }

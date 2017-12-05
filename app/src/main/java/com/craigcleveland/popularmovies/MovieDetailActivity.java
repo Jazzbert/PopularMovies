@@ -38,7 +38,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
         AdapterView.OnItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = "CCDEBUG-" + MovieDetailActivity.class.getSimpleName();
+    private static final String TAG = MovieDetailActivity.class.getSimpleName();
 
     private static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_POSTER,
@@ -179,7 +179,6 @@ public class MovieDetailActivity extends AppCompatActivity implements
     public Loader<Cursor> onCreateLoader(int id, final Bundle args) {
         switch (id) {
             case ID_DETAIL_LOADER:
-                Log.d(TAG, "Getting detail data");
                 return new CursorLoader(this,
                         mUri,
                         MOVIE_DETAIL_PROJECTION,
@@ -188,13 +187,11 @@ public class MovieDetailActivity extends AppCompatActivity implements
                         null);
 
             case TRAILER_LIST_LOADER:
-                Log.d(TAG, "Beginning trailer load");
                 return new NewDataCursorLoader(this,
                         MovieContract.MovieEntry.TRAILER_CONTENT_URI,
                         TRAILER_LIST_PROJECTION);
 
             case REVIEW_LIST_LOADER:
-                Log.d(TAG, "Beginning reviews load");
                 return new NewDataCursorLoader(this,
                         MovieContract.MovieEntry.REVIEWS_CONTENT_URI,
                         REVIEW_LIST_PROJECTION);
@@ -223,13 +220,11 @@ public class MovieDetailActivity extends AppCompatActivity implements
         @Override
         public Cursor loadInBackground() {
             if (sMovieID <=0) return null;
-            Log.d(TAG, "Getting data for: " + mContentUri.toString());
             if (mContentUri == MovieContract.MovieEntry.TRAILER_CONTENT_URI) {
                 MovieSyncTask.syncTrailers(getContext(), sMovieID);
             } else {
                 MovieSyncTask.syncReviews(getContext(), sMovieID);
             }
-            Log.d(TAG, "Completed data load for: " + mContentUri.toString());
 
             ContentResolver contentResolver = getContext().getContentResolver();
             Cursor result = contentResolver.query(mContentUri,
@@ -237,8 +232,6 @@ public class MovieDetailActivity extends AppCompatActivity implements
                     null,
                     null,
                     null);
-
-            Log.d(TAG, "Cursor rows: " + Integer.toString(result.getCount()));
 
             return result;
 
@@ -272,7 +265,6 @@ public class MovieDetailActivity extends AppCompatActivity implements
                 // Format and set release date
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 Date relDate = null;
-                Log.d(TAG, "Date trying to format: " + sReleaseDate);
                 try {
                     relDate = sdf.parse(sReleaseDate);
                 } catch (ParseException e) {
@@ -300,14 +292,12 @@ public class MovieDetailActivity extends AppCompatActivity implements
                 /* Check if we have valid data in the cursor */
                 if (null == data) throw new RuntimeException("No data returned from the loader");
                 mTrailerAdapter.swapCursor(data);
-                Log.d(TAG, "Trailer data updated, total rows = " + data.getCount());
                 if (mTrailerPosition == RecyclerView.NO_POSITION) mTrailerPosition = 0;
                 break;
 
             case REVIEW_LIST_LOADER:
                 if (null == data) throw new RuntimeException("No data returned from the loader");
                 mReviewAdapter.swapCursor(data);
-                Log.d(TAG, "Review data updated, total rows = " + data.getCount());
                 if (mReviewPosition == RecyclerView.NO_POSITION) mReviewPosition = 0;
                 break;
 

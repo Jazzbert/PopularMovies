@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder> {
 
-    private static final String TAG = "CCDEBUG-" + ReviewAdapter.class.getSimpleName();
+    private static final String TAG = ReviewAdapter.class.getSimpleName();
 
     private final ReviewAdapaterClickHandler mClickHandler;
 

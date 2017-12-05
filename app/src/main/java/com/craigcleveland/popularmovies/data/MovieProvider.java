@@ -16,7 +16,7 @@ import android.util.Log;
 
 public class MovieProvider extends ContentProvider {
 
-    private static final String TAG = "CCDEBUG-" + MovieProvider.class.getSimpleName();
+    private static final String TAG = MovieProvider.class.getSimpleName();
 
 
     // Public variables for use to reference from other classes
@@ -136,8 +136,6 @@ public class MovieProvider extends ContentProvider {
 
 
             case TRAILERS_LIST:
-                Log.d(TAG, "Query table name: " + MovieContract.MovieEntry.TRAILER_TABLE_NAME);
-
                 cursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TRAILER_TABLE_NAME,
                         projection,
@@ -163,8 +161,6 @@ public class MovieProvider extends ContentProvider {
                 break;
 
             case REVIEWS_LIST:
-                Log.d(TAG, "Query table name: " + MovieContract.MovieEntry.REVIEW_TABLE_NAME);
-
                 cursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.REVIEW_TABLE_NAME,
                         projection,
@@ -223,8 +219,6 @@ public class MovieProvider extends ContentProvider {
                 if (_id == -1) {
                     Log.e(TAG, "Unable to make DB insert, URI: " + uri.toString());
                 }
-
-                Log.d(TAG, "Favorite row inserted at " + _id);
 
                 return null;
 
@@ -344,7 +338,6 @@ public class MovieProvider extends ContentProvider {
                         MovieContract.MovieEntry.FAVORITES_TABLE_NAME,
                         selection,
                         selectionArgs);
-                Log.d(TAG, "Favorite rows deleted: " + numRowsDeleted);
                 break;
 
             default:

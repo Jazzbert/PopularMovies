@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements
         MovieAdapter.MovieAdapterClickHandler,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final String TAG = "CCDEBUG" + MainActivity.class.getSimpleName();
+    private final String TAG = MainActivity.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume was run");
         if (getSortType() == 2) {
             getSupportLoaderManager().initLoader(ID_FAV_MOVIE_LOADER, null, this);
             //mRecyclerView.swapAdapter(mMovieAdapter, true);
@@ -161,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onClick(int movieID, int position) {
-        Log.d(TAG, "click received for movieID: " + movieID);
         mPosition = position;
         Class destinationClass = MovieDetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(this, destinationClass);

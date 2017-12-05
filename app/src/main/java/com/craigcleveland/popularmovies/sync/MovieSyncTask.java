@@ -21,7 +21,7 @@ import java.net.URL;
 
 public class MovieSyncTask {
 
-    private static final String TAG = "CCDEBUG-" + MovieSyncTask.class.getSimpleName();
+    private static final String TAG = MovieSyncTask.class.getSimpleName();
 
     synchronized public static void syncMovies(Context context) {
 
@@ -29,8 +29,6 @@ public class MovieSyncTask {
         String sort_key = context.getString(R.string.pref_sort_order_key);
         String sort_default = context.getString(R.string.pref_sort_order_default);
         String sort_pref = sharedPreferences.getString(sort_key, sort_default);
-
-        Log.d(TAG, "Sort preference retrieved: " + sort_pref);
 
         int sortType;
         if (sort_pref.equals("0")) {
@@ -52,15 +50,11 @@ public class MovieSyncTask {
             ContentValues[] movieValues = MovieDBJsonUtils
                     .getMovieContentValuesFromJson(context, jsonMovieResponse);
 
-            Log.d(TAG, "movieValues length = " + movieValues.length);
-
             if (movieValues != null && movieValues.length != 0) {
                 ContentResolver movieCR = context.getContentResolver();
-                int numRowsDeleted = movieCR.delete(MovieContract.MovieEntry.MOVIE_CONTENT_URI, null, null);
-                Log.d(TAG, "rows deleted = " + numRowsDeleted);
+                movieCR.delete(MovieContract.MovieEntry.MOVIE_CONTENT_URI, null, null);
 
-                int numRowsInserted = movieCR.bulkInsert(MovieContract.MovieEntry.MOVIE_CONTENT_URI, movieValues);
-                Log.d(TAG, "rows inserted = " + numRowsInserted);
+                movieCR.bulkInsert(MovieContract.MovieEntry.MOVIE_CONTENT_URI, movieValues);
 
             }
 
@@ -71,8 +65,6 @@ public class MovieSyncTask {
     }
 
     synchronized public static void syncTrailers(Context context, int movie_id) {
-
-        Log.d(TAG, "syncTrailers has started");
 
         try {
             URL movieRequestUrl = NetworkUtils.buildTMDBURL(
@@ -87,14 +79,11 @@ public class MovieSyncTask {
 
             if (trailerValues != null && trailerValues.length != 0) {
                 ContentResolver trailerCR = context.getContentResolver();
-                int numRowsDeleted = trailerCR.delete(MovieContract.MovieEntry.TRAILER_CONTENT_URI,
+                trailerCR.delete(MovieContract.MovieEntry.TRAILER_CONTENT_URI,
                         null, null);
-                Log.d(TAG, "trailer rows deleted = " + numRowsDeleted);
 
-                int numRowsInserted = trailerCR.bulkInsert(
+                trailerCR.bulkInsert(
                         MovieContract.MovieEntry.TRAILER_CONTENT_URI, trailerValues);
-                Log.d(TAG, "trailer rows inserted = " + numRowsInserted);
-                Log.d(TAG, "inserted at URI: " + MovieContract.MovieEntry.TRAILER_CONTENT_URI);
 
             }
 
@@ -107,14 +96,11 @@ public class MovieSyncTask {
 
     synchronized public static void syncReviews(Context context, int movie_id) {
 
-        Log.d(TAG, "syncReviews has started - really");
-
         try {
             URL movieRequestUrl = NetworkUtils.buildTMDBURL(
                     MovieProvider.REVIEWS_LIST,
                     context.getString(R.string.tmdbAPIKey),
                     movie_id);
-            Log.d(TAG, "review url: " + movieRequestUrl.toString());
 
             String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
 
@@ -123,14 +109,11 @@ public class MovieSyncTask {
 
             if (reviewValues != null && reviewValues.length != 0) {
                 ContentResolver reviewCR = context.getContentResolver();
-                int numRowsDeleted = reviewCR.delete(MovieContract.MovieEntry.REVIEWS_CONTENT_URI,
+                reviewCR.delete(MovieContract.MovieEntry.REVIEWS_CONTENT_URI,
                         null, null);
-                Log.d(TAG, "review rows deleted = " + numRowsDeleted);
 
-                int numRowsInserted = reviewCR.bulkInsert(
+                reviewCR.bulkInsert(
                         MovieContract.MovieEntry.REVIEWS_CONTENT_URI, reviewValues);
-                Log.d(TAG, "review rows inserted = " + numRowsInserted);
-                Log.d(TAG, "inserted at URI: " + MovieContract.MovieEntry.REVIEWS_CONTENT_URI);
 
             }
 

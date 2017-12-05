@@ -22,7 +22,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     private Cursor mCursor;
 
     public interface MovieAdapterClickHandler {
-        void onClick(int movieID);
+        void onClick(int movieID, int position);
     }
 
     public MovieAdapter(@NonNull Context context, MovieAdapterClickHandler clickHandler) {
@@ -46,7 +46,8 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-            mClickHandler.onClick(mCursor.getInt(MainActivity.INDEX_MOVIE_ID));
+            mClickHandler.onClick(mCursor.getInt(MainActivity.INDEX_MOVIE_ID),
+                    adapterPosition);
         }
     }
 

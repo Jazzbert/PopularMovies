@@ -36,7 +36,9 @@ public class MainActivity extends AppCompatActivity implements
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
     private MovieAdapter mFavMovieAdapater;
+
     private int mPosition = RecyclerView.NO_POSITION;
+    private static final String POSITION_KEY = "position_key";
 
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
@@ -63,6 +65,11 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mPosition = savedInstanceState.getInt(POSITION_KEY);
+        }
+
         setContentView(R.layout.activity_main);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_main);
@@ -92,6 +99,11 @@ public class MainActivity extends AppCompatActivity implements
             showMovieDataView();
         }
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(POSITION_KEY, mPosition);
     }
 
     @Override
@@ -146,8 +158,9 @@ public class MainActivity extends AppCompatActivity implements
         return Integer.parseInt(sharedPreferences.getString(sort_key, sort_default));
     }
 
-    public void onClick(int movieID) {
+    public void onClick(int movieID, int position) {
         Log.d(TAG, "click received for movieID: " + movieID);
+        mPosition = position;
         Class destinationClass = MovieDetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(this, destinationClass);
         Uri uriForMovieClicked = MovieContract.MovieEntry.buildMovieDetailUri(movieID, getSortType());

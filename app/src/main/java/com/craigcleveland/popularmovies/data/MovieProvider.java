@@ -2,6 +2,7 @@ package com.craigcleveland.popularmovies.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,9 +14,10 @@ import android.util.Log;
 /**
  * ContentProvider for the movie data.  Allows reads/writes to the movie DB tables/views.
  * It is intended to provide public references, though not all references may be used by
- * the current version of the application.
+ * the current version of the application.  This class will always be called from an activity
+ * so warnings about null context are suppressed.
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "ConstantConditions"})
 public class MovieProvider extends ContentProvider {
 
     private static final String TAG = MovieProvider.class.getSimpleName();
@@ -117,7 +119,10 @@ public class MovieProvider extends ContentProvider {
 
                 // I believe this is necessary because of switching URIs on the cursor for
                 // the same recycler view.
-                cursor.setNotificationUri(getContext().getContentResolver(), uri);
+                Context context = getContext();
+                if (context != null) {
+                    cursor.setNotificationUri(getContext().getContentResolver(), uri);
+                }
 
                 break;
 

@@ -261,6 +261,7 @@ public class MovieDetailActivity extends AppCompatActivity implements
                 try {
                     relDate = sdf.parse(sReleaseDate);
                 } catch (ParseException e) {
+                    // This would be result of coding error and should crash for debugging.
                     e.printStackTrace();
                 }
                 java.text.DateFormat df =

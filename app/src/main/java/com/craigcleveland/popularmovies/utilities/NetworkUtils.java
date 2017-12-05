@@ -56,6 +56,7 @@ public final class NetworkUtils {
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
+            // This would be caused by coding error and should cause crash
             e.printStackTrace();
         }
 

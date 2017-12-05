@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String POSITION_KEY = "position_key";
 
     private TextView mErrorMessageDisplay;
+    private TextView mNoFavoritesDisplay;
     private ProgressBar mLoadingIndicator;
 
     public static final String[] MOVIE_LIST_PROJECTION = {
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_main);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
+        mNoFavoritesDisplay = (TextView) findViewById(R.id.tv_no_favorites_message);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
         /* Using LinearLayoutManager to support different options later */
@@ -172,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements
     /* This method hides the error message and displays movie poster grid. */
     private void showMovieDataView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+        mNoFavoritesDisplay.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
         mLoadingIndicator.setVisibility(View.INVISIBLE);
     }
@@ -180,6 +183,15 @@ public class MainActivity extends AppCompatActivity implements
     private void showErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        mNoFavoritesDisplay.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+    }
+
+    /* This method hides the movie poster grid and shows the message for no favorites selected. */
+    private void showNoFavoritesMessage() {
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+        mNoFavoritesDisplay.setVisibility(View.VISIBLE);
         mLoadingIndicator.setVisibility(View.INVISIBLE);
     }
 
@@ -226,7 +238,15 @@ public class MainActivity extends AppCompatActivity implements
         mMovieAdapter.notifyDataSetChanged();
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
-        if (data.getCount() != 0) showMovieDataView();
+        if (data.getCount() != 0) {
+            showMovieDataView();
+        } else {
+            if (getSortType() == 2) {
+                showNoFavoritesMessage();
+            } else {
+                showErrorMessage();
+            }
+        }
     }
 
     @Override

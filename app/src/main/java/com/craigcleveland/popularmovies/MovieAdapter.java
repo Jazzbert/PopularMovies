@@ -14,7 +14,7 @@ import com.squareup.picasso.Picasso;
 
 class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
-    private final String TAG = MovieAdapter.class.getSimpleName();
+//    private final String TAG = MovieAdapter.class.getSimpleName();
 
     private final MovieAdapterClickHandler mClickHandler;
 
@@ -25,7 +25,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         void onClick(int movieID, int position);
     }
 
-    public MovieAdapter(@NonNull Context context, MovieAdapterClickHandler clickHandler) {
+    MovieAdapter(@NonNull Context context, MovieAdapterClickHandler clickHandler) {
         mContext = context;
         mClickHandler = clickHandler;
     }
@@ -34,9 +34,9 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        public final ImageView mPosterImageView;
+        final ImageView mPosterImageView;
 
-        public MovieAdapterViewHolder(View view) {
+        MovieAdapterViewHolder(View view) {
             super(view);
             mPosterImageView = view.findViewById(R.id.iv_poster);
             view.setOnClickListener(this);

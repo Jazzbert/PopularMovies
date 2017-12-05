@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.craigcleveland.popularmovies.R;
 import com.craigcleveland.popularmovies.data.MovieContract;
@@ -16,14 +15,14 @@ import com.craigcleveland.popularmovies.utilities.NetworkUtils;
 import java.net.URL;
 
 /**
- * Created by craig on 8/26/17.
+ * Syncs the movie data with TheMovieDB site using the ContentProvider.
  */
 
 public class MovieSyncTask {
 
-    private static final String TAG = MovieSyncTask.class.getSimpleName();
+//    private static final String TAG = MovieSyncTask.class.getSimpleName();
 
-    synchronized public static void syncMovies(Context context) {
+    synchronized static void syncMovies(Context context) {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String sort_key = context.getString(R.string.pref_sort_order_key);
@@ -31,12 +30,16 @@ public class MovieSyncTask {
         String sort_pref = sharedPreferences.getString(sort_key, sort_default);
 
         int sortType;
-        if (sort_pref.equals("0")) {
-            sortType = MovieProvider.MOST_POPULAR;
-        } else if (sort_pref.equals("1")) {
-            sortType = MovieProvider.TOP_RATED;
-        } else {
-            return;  // No sync needed for Favorites
+        switch (sort_pref) {
+            case "0":
+                sortType = MovieProvider.MOST_POPULAR;
+                break;
+            case "1":
+                sortType = MovieProvider.TOP_RATED;
+                break;
+            default:
+                return;  // No sync needed for Favorites
+
         }
 
         try {
@@ -48,7 +51,7 @@ public class MovieSyncTask {
             String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
 
             ContentValues[] movieValues = MovieDBJsonUtils
-                    .getMovieContentValuesFromJson(context, jsonMovieResponse);
+                    .getMovieContentValuesFromJson(jsonMovieResponse);
 
             if (movieValues != null && movieValues.length != 0) {
                 ContentResolver movieCR = context.getContentResolver();
@@ -75,7 +78,7 @@ public class MovieSyncTask {
             String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
 
             ContentValues[] trailerValues = MovieDBJsonUtils
-                    .getTrailerContentValuesFromJson(context, jsonMovieResponse);
+                    .getTrailerContentValuesFromJson(jsonMovieResponse);
 
             if (trailerValues != null && trailerValues.length != 0) {
                 ContentResolver trailerCR = context.getContentResolver();
@@ -105,7 +108,7 @@ public class MovieSyncTask {
             String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
 
             ContentValues[] reviewValues = MovieDBJsonUtils
-                    .getReviewContentValuesFromJson(context, jsonMovieResponse);
+                    .getReviewContentValuesFromJson(jsonMovieResponse);
 
             if (reviewValues != null && reviewValues.length != 0) {
                 ContentResolver reviewCR = context.getContentResolver();

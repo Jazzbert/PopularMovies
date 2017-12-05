@@ -11,7 +11,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:src="@android:drawable/ic_menu_view"
-        android:tint="@android:color/black"/>
+        android:tint="@color/colorIcons"
+        android:contentDescription="@string/review_icon" />
     <TextView
         android:id="@+id/tv_review_author"
         android:layout_width="wrap_content"

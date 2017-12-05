@@ -4,30 +4,29 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * Created by craig on 11/18/17.
+ * Adapter for the list of reviews
  */
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder> {
 
-    private static final String TAG = ReviewAdapter.class.getSimpleName();
+//    private static final String TAG = ReviewAdapter.class.getSimpleName();
 
-    private final ReviewAdapaterClickHandler mClickHandler;
+    private final ReviewAdapterClickHandler mClickHandler;
 
     private final Context mContext;
     private Cursor mCursor;
 
-    public interface ReviewAdapaterClickHandler {
+    public interface ReviewAdapterClickHandler {
         void onClick(String reviewAuthor, String reviewContent);
     }
 
-    public ReviewAdapter(@NonNull Context context, ReviewAdapaterClickHandler clickHandler) {
+    ReviewAdapter(@NonNull Context context, ReviewAdapterClickHandler clickHandler) {
         mContext = context;
         mClickHandler = clickHandler;
     }
@@ -35,9 +34,9 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
     public class ReviewAdapterViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        public final TextView mReviewTextView;
+        final TextView mReviewTextView;
 
-        public ReviewAdapterViewHolder(View view) {
+        ReviewAdapterViewHolder(View view) {
             super(view);
             mReviewTextView = view.findViewById(R.id.tv_review_author);
             view.setOnClickListener(this);
@@ -45,8 +44,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
 
         @Override
         public void onClick(View v) {
-            int adapaterPosition = getAdapterPosition();
-            mCursor.moveToPosition(adapaterPosition);
+            int adapterPosition = getAdapterPosition();
+            mCursor.moveToPosition(adapterPosition);
             mClickHandler.onClick(mCursor.getString(MovieDetailActivity.INDEX_REVIEW_AUTHOR),
                     mCursor.getString(MovieDetailActivity.INDEX_REVIEW_CONTENT));
         }

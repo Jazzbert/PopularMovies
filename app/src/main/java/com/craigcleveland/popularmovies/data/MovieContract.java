@@ -4,17 +4,17 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Created by craig on 8/24/17.
+ * Movie Contract defines table and column names for the movie database.  The contract is
+ * intended to provide public references, though not all references may be used by the
+ * current version of the application.
  */
-
+@SuppressWarnings("WeakerAccess")
 public class MovieContract {
     public static final String CONTENT_AUTHORITY = "com.craigcleveland.popularmovies";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_MOVIE = "movie";
-    public static final String PATH_POPULAR = "movie/popular";
-    public static final String PATH_TOP_RATED = "movie/top_rated";
     public static final String PATH_TRAILERS = "videos";
     public static final String PATH_REVIEWS = "reviews";
     public static final String PATH_FAVORITES = "favorites";
@@ -26,10 +26,6 @@ public class MovieContract {
                 .appendPath(PATH_TRAILERS).build();
         public static final Uri REVIEWS_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_REVIEWS).build();
-        public static final Uri POPULAR_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_POPULAR).build();
-        public static final Uri TOP_RATED_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_TOP_RATED).build();
         public static final Uri FAVORITE_MOVIE_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_FAVORITES).build();
 
@@ -72,18 +68,18 @@ public class MovieContract {
             }
         }
 
-        public static Uri buildTrailerListUri(int movieID) {
-            return MOVIE_CONTENT_URI.buildUpon()
-                    .appendPath(Integer.toString(movieID))
-                    .appendPath(PATH_TRAILERS).build();
-        }
-
-        public static Uri buildReviewListUri(int movieID) {
-            return MOVIE_CONTENT_URI.buildUpon()
-                    .appendPath(Integer.toString(movieID))
-                    .appendPath(PATH_REVIEWS).build();
-        }
-
+//        public static Uri buildTrailerListUri(int movieID) {
+//            return MOVIE_CONTENT_URI.buildUpon()
+//                    .appendPath(Integer.toString(movieID))
+//                    .appendPath(PATH_TRAILERS).build();
+//        }
+//
+//        public static Uri buildReviewListUri(int movieID) {
+//            return MOVIE_CONTENT_URI.buildUpon()
+//                    .appendPath(Integer.toString(movieID))
+//                    .appendPath(PATH_REVIEWS).build();
+//        }
+//
     }
 
 

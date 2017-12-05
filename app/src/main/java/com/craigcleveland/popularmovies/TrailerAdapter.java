@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * Created by craig on 10/7/17.
+ * Adapter for the list of trailers.
  */
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerAdapterViewHolder> {
 
-    private final String TAG = TrailerAdapter.class.getSimpleName();
+//    private final String TAG = TrailerAdapter.class.getSimpleName();
 
     private final TrailerAdapterClickHandler mClickHandler;
 
@@ -26,7 +26,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
         void onClick(String trailerKey);
     }
 
-    public TrailerAdapter(@NonNull Context context, TrailerAdapterClickHandler clickHandler) {
+    TrailerAdapter(@NonNull Context context, TrailerAdapterClickHandler clickHandler) {
         mContext = context;
         mClickHandler = clickHandler;
     }
@@ -34,9 +34,9 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
     public class TrailerAdapterViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        public final TextView mTrailerTextView;
+        final TextView mTrailerTextView;
 
-        public TrailerAdapterViewHolder(View view) {
+        TrailerAdapterViewHolder(View view) {
             super(view);
             mTrailerTextView = view.findViewById(R.id.tv_trailer_name);
             view.setOnClickListener(this);

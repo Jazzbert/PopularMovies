@@ -1,7 +1,6 @@
 package com.craigcleveland.popularmovies.utilities;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.craigcleveland.popularmovies.data.MovieProvider;
@@ -29,11 +28,11 @@ public final class NetworkUtils {
      *
      * @return The URL to use to query the weather server
      */
-    public static URL buildTMDBURL(int queryType, String api_key, @Nullable int query_id) {
+    public static URL buildTMDBURL(int queryType, String api_key, int query_id) {
 
         Log.d(TAG, "TMDB queryType: " + queryType);
 
-        String queryPath = "0";
+        String queryPath;
         if (queryType == MovieProvider.TOP_RATED) {
             queryPath = "movie/top_rated";
         } else if (queryType == MovieProvider.MOST_POPULAR) {

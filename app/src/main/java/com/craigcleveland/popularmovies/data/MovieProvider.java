@@ -11,9 +11,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
- * Created by craig on 8/23/17.
+ * ContentProvider for the movie data.  Allows reads/writes to the movie DB tables/views.
+ * It is intended to provide public references, though not all references may be used by
+ * the current version of the application.
  */
-
+@SuppressWarnings("WeakerAccess")
 public class MovieProvider extends ContentProvider {
 
     private static final String TAG = MovieProvider.class.getSimpleName();

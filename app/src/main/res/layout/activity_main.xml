@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:background="@android:color/black"
     android:orientation="vertical"
-    tools:context="com.craigcleveland.popularmovies.MainActivity">
+    tools:context="com.craigcleveland.popularmovies.MainActivity"
+    tools:ignore="Overdraw" > <!-- re:ignore - background color is required -->
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_main"

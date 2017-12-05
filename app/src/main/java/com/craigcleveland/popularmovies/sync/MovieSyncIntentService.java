@@ -5,7 +5,8 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 
 /**
- * Created by craig on 8/26/17.
+ * This subclass is structured to set up scheduled syncs; though, for this app may
+ * I don't think it's really necessary.  Maybe will update in the future.
  */
 
 public class MovieSyncIntentService extends IntentService {

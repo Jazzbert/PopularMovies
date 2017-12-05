@@ -10,30 +10,31 @@ import us.feras.mdv.MarkdownView;
 
 public class ReviewActivity extends AppCompatActivity {
 
-    private TextView mMovieTitleTextView;
-    private TextView mReviewAuthorTextView;
-    private MarkdownView mReviewContentMarkdownView;
-
-    private static String sMovieTitle;
-    private static String sReviewAuthor;
-    private static String sReviewContent;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
 
-        sMovieTitle = getIntent().getStringExtra(MovieContract.MovieEntry.COLUMN_TITLE);
-        sReviewAuthor = getIntent().getStringExtra(MovieContract.MovieEntry.COLUMN_REVIEW_AUTHOR);
-        sReviewContent = getIntent().getStringExtra(MovieContract.MovieEntry.COLUMN_REVIEW_CONTENT);
+        String movieTitle;
+        String reviewAuthor;
+        String reviewContent;
 
-        mMovieTitleTextView = (TextView) findViewById(R.id.tv_review_title);
-        mReviewAuthorTextView = (TextView) findViewById(R.id.tv_review_author);
-        mReviewContentMarkdownView = (MarkdownView) findViewById(R.id.md_review_content);
+        TextView movieTitleTextView;
+        TextView reviewAuthorTextView;
+        MarkdownView reviewContentMarkdownView;
 
-        mMovieTitleTextView.setText(sMovieTitle);
-        mReviewAuthorTextView.setText("Review by " + sReviewAuthor);
-        mReviewContentMarkdownView.loadMarkdown(sReviewContent);
+        movieTitle = getIntent().getStringExtra(MovieContract.MovieEntry.COLUMN_TITLE);
+        reviewAuthor = getIntent().getStringExtra(MovieContract.MovieEntry.COLUMN_REVIEW_AUTHOR);
+        reviewContent = getIntent().getStringExtra(MovieContract.MovieEntry.COLUMN_REVIEW_CONTENT);
+
+        movieTitleTextView = findViewById(R.id.tv_review_title);
+        reviewAuthorTextView = findViewById(R.id.tv_review_author);
+        reviewContentMarkdownView = findViewById(R.id.md_review_content);
+
+        movieTitleTextView.setText(movieTitle);
+        String revBy = getString(R.string.review_by) + reviewAuthor;
+        reviewAuthorTextView.setText(revBy);
+        reviewContentMarkdownView.loadMarkdown(reviewContent);
 
     }
 }

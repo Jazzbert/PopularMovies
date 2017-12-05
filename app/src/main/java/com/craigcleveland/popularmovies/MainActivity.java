@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,11 +30,10 @@ public class MainActivity extends AppCompatActivity implements
         MovieAdapter.MovieAdapterClickHandler,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final String TAG = MainActivity.class.getSimpleName();
+//    private final String TAG = MainActivity.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
-    private MovieAdapter mFavMovieAdapater;
 
     private int mPosition = RecyclerView.NO_POSITION;
     private static final String POSITION_KEY = "position_key";
@@ -44,13 +42,13 @@ public class MainActivity extends AppCompatActivity implements
     private TextView mNoFavoritesDisplay;
     private ProgressBar mLoadingIndicator;
 
-    public static final String[] MOVIE_LIST_PROJECTION = {
+    private static final String[] MOVIE_LIST_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_TITLE,
             MovieContract.MovieEntry.COLUMN_POSTER
     };
 
-    public static final String[] FAV_MOVIE_LIST_PROJECTION = {
+    private static final String[] FAV_MOVIE_LIST_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_TITLE,
             MovieContract.MovieEntry.COLUMN_POSTER
@@ -73,10 +71,10 @@ public class MainActivity extends AppCompatActivity implements
 
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_main);
-        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
-        mNoFavoritesDisplay = (TextView) findViewById(R.id.tv_no_favorites_message);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mRecyclerView = findViewById(R.id.rv_main);
+        mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
+        mNoFavoritesDisplay = findViewById(R.id.tv_no_favorites_message);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
         /* Using LinearLayoutManager to support different options later */
         GridLayoutManager layoutManger =
@@ -105,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putInt(POSITION_KEY, mPosition);
     }
 

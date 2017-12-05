@@ -3,23 +3,21 @@ package com.craigcleveland.popularmovies.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.craigcleveland.popularmovies.data.MovieContract.MovieEntry;
 
 /**
- * Created by craig on 8/24/17.
+ * Manages the local DB for movie data including creating tables/views used by the provider.
  */
+class MovieDbHelper extends SQLiteOpenHelper {
 
-public class MovieDbHelper extends SQLiteOpenHelper {
+//    private final String TAG = MovieDbHelper.class.getSimpleName();
 
-    private final String TAG = MovieDbHelper.class.getSimpleName();
-
-    public static final String DATABASE_NAME = "movie.db";
+    private static final String DATABASE_NAME = "movie.db";
 
     private static final int DATABASE_VERSION = 17;
 
-    public MovieDbHelper(Context context) {
+    MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -96,7 +94,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.MOVIE_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TRAILER_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.REVIEW_TABLE_NAME);
-        // This will eliminate favorites saved when upgrading DB...possibile future
+        // This will eliminate favorites saved when upgrading DB...possible future
         // enhancement may include code to retain current favorites during DB changes.
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.FAVORITES_TABLE_NAME);
         onCreate(sqLiteDatabase);

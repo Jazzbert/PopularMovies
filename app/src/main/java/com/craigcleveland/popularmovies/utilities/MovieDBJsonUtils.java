@@ -1,8 +1,6 @@
 package com.craigcleveland.popularmovies.utilities;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
-import android.content.Context;
 import android.util.Log;
 
 import com.craigcleveland.popularmovies.data.MovieContract;
@@ -11,36 +9,30 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class MovieDBJsonUtils {
 
     private static final String TAG = MovieDBJsonUtils.class.getSimpleName();
 
-    /* Movie Data Structure */
-    public static final int MOVIE_ID = 0;
-    public static final int MOVIE_TITLE = 1;
-    public static final int MOVIE_POSTER = 2;
-    public static final int MOVIE_RATING = 3;
-    public static final int MOVIE_RELEASE = 4;
-    public static final int MOVIE_SYNOPSIS = 5;
-
-    /* Trailer Data Structure */
-    public static final int TRAILER_ID = 0;
-    public static final int TRAILER_NAME = 1;
-    public static final int TRAILER_KEY = 2;
-    public static final int TRAILER_SITE = 3;
-    public static final int TRAILER_MOVIE_ID = 4;
-
-    /* Review Data Structure */
-    public static final int REVIEW_ID = 0;
-    public static final int REVIEW_AUTHOR = 1;
-    public static final int REVIEW_CONTENT = 2;
-    public static final int REVIEW_MOVID_ID = 3;
+//    /* Movie Data Structure */
+//    private static final int MOVIE_ID = 0;
+//    private static final int MOVIE_TITLE = 1;
+//    private static final int MOVIE_POSTER = 2;
+//    private static final int MOVIE_RATING = 3;
+//    private static final int MOVIE_RELEASE = 4;
+//    private static final int MOVIE_SYNOPSIS = 5;
+//
+//    /* Trailer Data Structure */
+//    public static final int TRAILER_ID = 0;
+//    private static final int TRAILER_NAME = 1;
+//    private static final int TRAILER_KEY = 2;
+//    private static final int TRAILER_SITE = 3;
+//    public static final int TRAILER_MOVIE_ID = 4;
+//
+//    /* Review Data Structure */
+//    public static final int REVIEW_ID = 0;
+//    public static final int REVIEW_AUTHOR = 1;
+//    public static final int REVIEW_CONTENT = 2;
+//    public static final int REVIEW_MOVIE_ID = 3;
 
     /* Movie field information */
     private static final String TMD_RESULTS_LABEL = "results";
@@ -56,7 +48,6 @@ public class MovieDBJsonUtils {
     private static final String TRAILER_NAME_LABEL = "name";
     private static final String TRAILER_KEY_LABEL = "key";
     private static final String TRAILER_SITE_LABEL = "site";
-    private static final String TRAILER_TYPE_LABEL = "trailer";
 
     private static final String REVIEW_ID_LABEL = "id";
     private static final String REVIEW_AUTHOR_LABEL = "author";
@@ -65,8 +56,7 @@ public class MovieDBJsonUtils {
     private static final String TMD_CODE_LABEL = "status_code";
     private static final String TMD_MESSAGE_LABEL = "status_message";
 
-    public static ContentValues[] getMovieContentValuesFromJson(Context context,
-                                                                  String movieJsonStr)
+    public static ContentValues[] getMovieContentValuesFromJson(String movieJsonStr)
             throws JSONException {
         JSONObject movieJson = new JSONObject(movieJsonStr);
 
@@ -114,8 +104,7 @@ public class MovieDBJsonUtils {
 
     }
 
-    public static ContentValues[] getTrailerContentValuesFromJson(Context context,
-                                                                  String trailerJsonStr)
+    public static ContentValues[] getTrailerContentValuesFromJson(String trailerJsonStr)
         throws JSONException {
         JSONObject trailerJson = new JSONObject(trailerJsonStr);
 
@@ -149,14 +138,11 @@ public class MovieDBJsonUtils {
 
     }
 
-    public static ContentValues[] getReviewContentValuesFromJson(Context context,
-                                                                  String reviewJsonStr)
+    public static ContentValues[] getReviewContentValuesFromJson(String reviewJsonStr)
             throws JSONException {
         JSONObject reviewJson = new JSONObject(reviewJsonStr);
 
         if (checkResponseError(reviewJson)) throw new UnsupportedOperationException();
-
-        int movie_id = reviewJson.getInt(MOVIE_ID_LABEL);
 
         JSONArray jsonReviewArray = reviewJson.getJSONArray(TMD_RESULTS_LABEL);
 
@@ -181,85 +167,85 @@ public class MovieDBJsonUtils {
 
     }
 
-    public static String[][] getSimpleMovieStringsFromJson(String movieJsonStr)
-            throws JSONException {
+//    public static String[][] getSimpleMovieStringsFromJson(String movieJsonStr)
+//            throws JSONException {
+//
+//        String[][] movieData;
+//
+//        JSONObject movieJson = new JSONObject(movieJsonStr);
+//
+//        /* Check for error */
+//        if (checkResponseError(movieJson)) throw new UnsupportedOperationException();
+//
+//        JSONArray movieArray = movieJson.getJSONArray(TMD_RESULTS_LABEL);
+//        movieData = new String[movieArray.length()][6];
+//
+//        for (int i = 0; i < movieArray.length(); i++) {
+//            JSONObject movie = movieArray.getJSONObject(i);
+//            // Movie ID
+//            movieData[i][MOVIE_ID] = Integer.toString(movie.getInt(MOVIE_ID_LABEL));
+//
+//            // Movie Title
+//            movieData[i][MOVIE_TITLE] = movie.getString(MOVIE_TITLE_LABEL);
+//
+//            // Movie Poster Path
+//            movieData[i][MOVIE_POSTER] = movie.getString(MOVIE_POSTER_LABEL);
+//
+//            // Movie User Rating
+//            DecimalFormat df = new DecimalFormat("#.0");
+//            movieData[i][MOVIE_RATING] = df.format(movie.getDouble(MOVIE_USER_RATING_LABEL));
+//
+//            // Movie Release Date
+//            String reformattedDate = "";
+//            try {
+//                /* Specified Date Format based on input from themoviedb.org */
+//                @SuppressLint("SimpleDateFormat") DateFormat sdfIn =
+//                        new SimpleDateFormat("yyyy-MM-dd");
+//                DateFormat sdfOut = DateFormat.getDateInstance(DateFormat.MEDIUM);
+//                String originalDate = movie.getString(MOVIE_RELEASE_DATE_LABEL);
+//                reformattedDate = sdfOut.format(sdfIn.parse(originalDate));
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//            movieData[i][MOVIE_RELEASE] = reformattedDate;
+//
+//            // Movie Synopsis
+//            movieData[i][MOVIE_SYNOPSIS] = movie.getString(MOVIE_SYNOPSIS_LABEL);
+//        }
+//
+//        return movieData;
+//    }
 
-        String[][] movieData;
-
-        JSONObject movieJson = new JSONObject(movieJsonStr);
-
-        /* Check for error */
-        if (checkResponseError(movieJson)) throw new UnsupportedOperationException();
-
-        JSONArray movieArray = movieJson.getJSONArray(TMD_RESULTS_LABEL);
-        movieData = new String[movieArray.length()][6];
-
-        for (int i = 0; i < movieArray.length(); i++) {
-            JSONObject movie = movieArray.getJSONObject(i);
-            // Movie ID
-            movieData[i][MOVIE_ID] = Integer.toString(movie.getInt(MOVIE_ID_LABEL));
-
-            // Movie Title
-            movieData[i][MOVIE_TITLE] = movie.getString(MOVIE_TITLE_LABEL);
-
-            // Movie Poster Path
-            movieData[i][MOVIE_POSTER] = movie.getString(MOVIE_POSTER_LABEL);
-
-            // Movie User Rating
-            DecimalFormat df = new DecimalFormat("#.0");
-            movieData[i][MOVIE_RATING] = df.format(movie.getDouble(MOVIE_USER_RATING_LABEL));
-
-            // Movie Release Date
-            String reformattedDate = "";
-            try {
-                /* Specified Date Format based on input from themoviedb.org */
-                @SuppressLint("SimpleDateFormat") DateFormat sdfIn =
-                        new SimpleDateFormat("yyyy-MM-dd");
-                DateFormat sdfOut = DateFormat.getDateInstance(DateFormat.MEDIUM);
-                String originalDate = movie.getString(MOVIE_RELEASE_DATE_LABEL);
-                reformattedDate = sdfOut.format(sdfIn.parse(originalDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            movieData[i][MOVIE_RELEASE] = reformattedDate;
-
-            // Movie Synopsis
-            movieData[i][MOVIE_SYNOPSIS] = movie.getString(MOVIE_SYNOPSIS_LABEL);
-        }
-
-        return movieData;
-    }
-
-    public static String[][] getSimpleTrailerStringsFromJson(String trailerJsonStr)
-            throws JSONException {
-
-        /* Trailer information.  Each trailer is an element of the "results" array */
-
-        String[][] trailerData;
-
-        JSONObject trailerJson = new JSONObject(trailerJsonStr);
-
-        /* Check for error */
-        if (checkResponseError(trailerJson)) throw new UnsupportedOperationException();
-
-        JSONArray trailerArray = trailerJson.getJSONArray(TMD_RESULTS_LABEL);
-        trailerData = new String[trailerArray.length()][4];
-
-        for (int i = 0; i < trailerArray.length(); i++) {
-            JSONObject trailer = trailerArray.getJSONObject(i);
-            // Trailer Name
-            trailerData[i][TRAILER_NAME] = trailer.getString(TRAILER_NAME_LABEL);
-
-            // Trailer Key
-            trailerData[i][TRAILER_KEY] = trailer.getString(TRAILER_KEY_LABEL);
-
-            // Trailer Site
-            trailerData[i][TRAILER_SITE] = trailer.getString(TRAILER_SITE_LABEL);
-        }
-
-        return trailerData;
-
-    }
+//    public static String[][] getSimpleTrailerStringsFromJson(String trailerJsonStr)
+//            throws JSONException {
+//
+//        /* Trailer information.  Each trailer is an element of the "results" array */
+//
+//        String[][] trailerData;
+//
+//        JSONObject trailerJson = new JSONObject(trailerJsonStr);
+//
+//        /* Check for error */
+//        if (checkResponseError(trailerJson)) throw new UnsupportedOperationException();
+//
+//        JSONArray trailerArray = trailerJson.getJSONArray(TMD_RESULTS_LABEL);
+//        trailerData = new String[trailerArray.length()][4];
+//
+//        for (int i = 0; i < trailerArray.length(); i++) {
+//            JSONObject trailer = trailerArray.getJSONObject(i);
+//            // Trailer Name
+//            trailerData[i][TRAILER_NAME] = trailer.getString(TRAILER_NAME_LABEL);
+//
+//            // Trailer Key
+//            trailerData[i][TRAILER_KEY] = trailer.getString(TRAILER_KEY_LABEL);
+//
+//            // Trailer Site
+//            trailerData[i][TRAILER_SITE] = trailer.getString(TRAILER_SITE_LABEL);
+//        }
+//
+//        return trailerData;
+//
+//    }
 
     private static boolean checkResponseError(JSONObject jsonData) throws JSONException {
         if (jsonData.has(TMD_CODE_LABEL)) {

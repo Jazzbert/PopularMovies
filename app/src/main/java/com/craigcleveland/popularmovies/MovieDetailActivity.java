@@ -1,5 +1,6 @@
 package com.craigcleveland.popularmovies;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,13 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.craigcleveland.popularmovies.data.MovieContract;
@@ -34,11 +33,11 @@ import java.util.Date;
 
 public class MovieDetailActivity extends AppCompatActivity implements
         TrailerAdapter.TrailerAdapterClickHandler,
-        ReviewAdapter.ReviewAdapaterClickHandler,
+        ReviewAdapter.ReviewAdapterClickHandler,
         AdapterView.OnItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = MovieDetailActivity.class.getSimpleName();
+//    private static final String TAG = MovieDetailActivity.class.getSimpleName();
 
     private static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_POSTER,
@@ -49,36 +48,36 @@ public class MovieDetailActivity extends AppCompatActivity implements
             MovieContract.MovieEntry.COLUMN_FAV_MOVIE_ID
     };
 
-    public static final int INDEX_MOVIE_POSTER = 0;
-    public static final int INDEX_MOVIE_TITLE = 1;
-    public static final int INDEX_MOVIE_RELEASE_DATE = 2;
-    public static final int INDEX_MOVIE_RATING = 3;
-    public static final int INDEX_MOVIE_SYNOPSIS = 4;
-    public static final int INDEX_MOVIE_FAVORITE_ID = 5;
+    private static final int INDEX_MOVIE_POSTER = 0;
+    private static final int INDEX_MOVIE_TITLE = 1;
+    private static final int INDEX_MOVIE_RELEASE_DATE = 2;
+    private static final int INDEX_MOVIE_RATING = 3;
+    private static final int INDEX_MOVIE_SYNOPSIS = 4;
+    private static final int INDEX_MOVIE_FAVORITE_ID = 5;
     
-    public static final String[] TRAILER_LIST_PROJECTION = {
+    private static final String[] TRAILER_LIST_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_TRAILER_ID,
             MovieContract.MovieEntry.COLUMN_TRAILER_KEY,
             MovieContract.MovieEntry.COLUMN_TRAILER_NAME
     };
 
-    public static final int INDEX_TRAILER_ID = 0;
+//    public static final int INDEX_TRAILER_ID = 0;
     public static final int INDEX_TRAILER_KEY = 1;
     public static final int INDEX_TRAILER_NAME = 2;
     
-    public static final String[] REVIEW_LIST_PROJECTION = {
+    private static final String[] REVIEW_LIST_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_REVIEW_ID,
             MovieContract.MovieEntry.COLUMN_REVIEW_AUTHOR,
             MovieContract.MovieEntry.COLUMN_REVIEW_CONTENT
     };
 
-    public static final int INDEX_REVIEW_ID = 0;
+//    public static final int INDEX_REVIEW_ID = 0;
     public static final int INDEX_REVIEW_AUTHOR = 1;
     public static final int INDEX_REVIEW_CONTENT = 2;
 
     private static final int ID_DETAIL_LOADER = 1200;
-    public static final int TRAILER_LIST_LOADER = 1300;
-    public static final int REVIEW_LIST_LOADER = 1400;
+    private static final int TRAILER_LIST_LOADER = 1300;
+    private static final int REVIEW_LIST_LOADER = 1400;
 
     private ImageView mPosterImageView;
     private TextView mMovieTitleTextView;
@@ -87,11 +86,10 @@ public class MovieDetailActivity extends AppCompatActivity implements
     private TextView mSynopsisTextView;
     private ToggleButton mFavoriteToggleButton;
 
-    private RecyclerView mTrailerRecyclerView;
+
     private TrailerAdapter mTrailerAdapter;
     private int mTrailerPosition = RecyclerView.NO_POSITION;
 
-    private RecyclerView mReviewRecyclerView;
     private ReviewAdapter mReviewAdapter;
     private int mReviewPosition = RecyclerView.NO_POSITION;
 
@@ -106,18 +104,21 @@ public class MovieDetailActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        RecyclerView trailerRecyclerView;
+        RecyclerView reviewRecyclerView;
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_movie_detail);
         sMovieID = getIntent().getIntExtra(MovieContract.MovieEntry.COLUMN_MOVIE_ID, -1);
 
         // Establish basic movie detail items
-        mPosterImageView = (ImageView) findViewById(R.id.iv_poster);
-        mMovieTitleTextView = (TextView) findViewById(R.id.tv_detail_title);
-        mReleaseDateTextView = (TextView) findViewById(R.id.tv_detail_release_date);
-        mUserRatingTextView = (TextView) findViewById(R.id.tv_detail_user_rating);
-        mSynopsisTextView = (TextView) findViewById(R.id.tv_detail_synopsis);
-        mFavoriteToggleButton = (ToggleButton) findViewById(R.id.tb_favorite);
+        mPosterImageView = findViewById(R.id.iv_poster);
+        mMovieTitleTextView = findViewById(R.id.tv_detail_title);
+        mReleaseDateTextView = findViewById(R.id.tv_detail_release_date);
+        mUserRatingTextView = findViewById(R.id.tv_detail_user_rating);
+        mSynopsisTextView = findViewById(R.id.tv_detail_synopsis);
+        mFavoriteToggleButton = findViewById(R.id.tb_favorite);
 
         mUri = getIntent().getData();
         if (null == mUri  ) throw new NullPointerException("URI for DetailActivity cannot be null");
@@ -132,24 +133,24 @@ public class MovieDetailActivity extends AppCompatActivity implements
         });
 
         // Establish trailer layout items
-        mTrailerRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
+        trailerRecyclerView = findViewById(R.id.rv_trailers);
 
         LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this);
-        mTrailerRecyclerView.setLayoutManager(trailerLayoutManager);
-        mTrailerRecyclerView.setHasFixedSize(true);
+        trailerRecyclerView.setLayoutManager(trailerLayoutManager);
+        trailerRecyclerView.setHasFixedSize(true);
 
         mTrailerAdapter = new TrailerAdapter(this, this);
-        mTrailerRecyclerView.setAdapter(mTrailerAdapter);
+        trailerRecyclerView.setAdapter(mTrailerAdapter);
 
         // Establish review layout items
-        mReviewRecyclerView = (RecyclerView) findViewById(R.id.rv_reviews);
+        reviewRecyclerView = findViewById(R.id.rv_reviews);
 
         LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this);
-        mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
-        mReviewRecyclerView.setHasFixedSize(true);
+        reviewRecyclerView.setLayoutManager(reviewLayoutManager);
+        reviewRecyclerView.setHasFixedSize(true);
 
         mReviewAdapter = new ReviewAdapter(this, this);
-        mReviewRecyclerView.setAdapter(mReviewAdapter);
+        reviewRecyclerView.setAdapter(mReviewAdapter);
 
         // Start data loads
         LoaderManager loaderManager = getSupportLoaderManager();
@@ -196,10 +197,10 @@ public class MovieDetailActivity extends AppCompatActivity implements
     }
 
     private static class NewDataCursorLoader extends AsyncTaskLoader<Cursor> {
-        private Uri mContentUri;
-        private String[] mProjection;
+        private final Uri mContentUri;
+        private final String[] mProjection;
 
-        public NewDataCursorLoader(Context context, Uri contentUri, String[] projection) {
+        NewDataCursorLoader(Context context, Uri contentUri, String[] projection) {
             super(context);
             mContentUri = contentUri;
             mProjection = projection;
@@ -220,17 +221,16 @@ public class MovieDetailActivity extends AppCompatActivity implements
             }
 
             ContentResolver contentResolver = getContext().getContentResolver();
-            Cursor result = contentResolver.query(mContentUri,
+            return contentResolver.query(mContentUri,
                     mProjection,
                     null,
                     null,
                     null);
 
-            return result;
-
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         boolean cursorHasValidData = false;
@@ -255,8 +255,8 @@ public class MovieDetailActivity extends AppCompatActivity implements
                         NetworkUtils.buildPosterURL(sPoster);
                 Picasso.with(this).load(posterUrl).into(mPosterImageView);
 
-                // Format and set release date
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                // Format and set release date - lint suppressed because date from TMDB is explicit
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 Date relDate = null;
                 try {
                     relDate = sdf.parse(sReleaseDate);

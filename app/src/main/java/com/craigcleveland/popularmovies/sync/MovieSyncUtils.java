@@ -9,13 +9,13 @@ import android.support.annotation.NonNull;
 import com.craigcleveland.popularmovies.data.MovieContract;
 
 /**
- * Created by craig on 8/26/17.
+ * This is part of structure for scheduled sync, which I don't think is necessary for this app.
+ * Might further develop in the future.
  */
 
 public class MovieSyncUtils {
 
     private static boolean sMovieSyncInitialized;
-    private static boolean sTrailerSyncInitialized;
 
     synchronized public static void initialize(@NonNull final Context context) {
 
@@ -52,15 +52,6 @@ public class MovieSyncUtils {
     public static void startImmediateSync(@NonNull final Context context) {
         Intent intentToSyncImmediately = new Intent(context, MovieSyncIntentService.class);
         context.startService(intentToSyncImmediately);
-    }
-
-    synchronized public static void syncTrailerList(@NonNull final Context context) {
-        if (sTrailerSyncInitialized) return;
-
-        sTrailerSyncInitialized = true;
-
-
-
     }
 
 }

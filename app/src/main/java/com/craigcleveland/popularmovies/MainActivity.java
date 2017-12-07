@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -36,16 +35,11 @@ public class MainActivity extends AppCompatActivity implements
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
 
-    private int mPosition = RecyclerView.NO_POSITION;
-    private static final String POSITION_KEY = "position_key";
     private static final String SAVED_LAYOUT_MANAGER = "saved_layout_manager";
 
     private TextView mErrorMessageDisplay;
     private TextView mNoFavoritesDisplay;
     private ProgressBar mLoadingIndicator;
-
-    private Parcelable mLayoutManagerSavedState;
-
 
     private static final String[] MOVIE_LIST_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
@@ -105,17 +99,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-//        outState.putInt(POSITION_KEY, mPosition);
         outState.putParcelable(SAVED_LAYOUT_MANAGER,
                 mRecyclerView.getLayoutManager().onSaveInstanceState());
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        mLayoutManagerSavedState = savedInstanceState.getParcelable(SAVED_LAYOUT_MANAGER);
-
-        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
@@ -170,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onClick(int movieID, int position) {
-        mPosition = position;
         Class destinationClass = MovieDetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(this, destinationClass);
         Uri uriForMovieClicked = MovieContract.MovieEntry.buildMovieDetailUri(movieID, getSortType());

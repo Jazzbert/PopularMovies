@@ -1,6 +1,7 @@
 package com.craigcleveland.popularmovies;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -317,13 +318,17 @@ public class MovieDetailActivity extends AppCompatActivity implements
 
     @Override
     public void onClick(String trailerID) {
-        Intent watchVideo = new Intent(Intent.ACTION_VIEW);
-        Uri videoUri = Uri.parse("http://www.youtube.com/embed/" + trailerID);
-        watchVideo.setData(videoUri);
-        if (watchVideo.resolveActivity(getPackageManager()) != null) {
-            startActivity(watchVideo);
+        Intent youTubeAppIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("vnd.youtube:" + trailerID));
+        Intent youTubeWebIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/embed/" + trailerID));
+        try {
+            startActivity(youTubeAppIntent);
+        } catch (ActivityNotFoundException e) {
+            startActivity(youTubeWebIntent);
         }
     }
+
 
     @Override
     public void onClick(String reviewAuthor, String reviewContent) {

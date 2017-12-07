@@ -365,24 +365,4 @@ public class MovieDetailActivity extends AppCompatActivity implements
         }).start();
     }
 
-//    public class DetailDataLoader extends AsyncTaskLoader<Void> {
-//
-//        int mMovieID;
-//
-//
-//        public DetailDataLoader(Context context, int movieID) {
-//            super(context);
-//            mMovieID = movieID;
-//        }
-//
-//        @Override
-//        public Void loadInBackground() {
-//            Log.d(TAG, "Starting trailer sync");
-//            MovieSyncTask.syncTrailers(getContext(), mMovieID);
-//            Log.d(TAG, "Finished trailer sync");
-//
-//            return null;
-//        }
-//    }
-//
 }

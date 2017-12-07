@@ -244,11 +244,6 @@ public class MainActivity extends AppCompatActivity implements
         if (null == data) throw new RuntimeException("No data returned from the loader");
         mMovieAdapter.swapCursor(data);
         mMovieAdapter.notifyDataSetChanged();
-//        if (mLayoutManagerSavedState != null) {
-//            mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerSavedState);
-//        }
-//        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
-//        mRecyclerView.smoothScrollToPosition(mPosition);
         if (data.getCount() != 0) {
             showMovieDataView();
         } else {

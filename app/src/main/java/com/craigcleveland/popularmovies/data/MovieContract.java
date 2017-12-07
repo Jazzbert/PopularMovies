@@ -68,18 +68,6 @@ public class MovieContract {
             }
         }
 
-//        public static Uri buildTrailerListUri(int movieID) {
-//            return MOVIE_CONTENT_URI.buildUpon()
-//                    .appendPath(Integer.toString(movieID))
-//                    .appendPath(PATH_TRAILERS).build();
-//        }
-//
-//        public static Uri buildReviewListUri(int movieID) {
-//            return MOVIE_CONTENT_URI.buildUpon()
-//                    .appendPath(Integer.toString(movieID))
-//                    .appendPath(PATH_REVIEWS).build();
-//        }
-//
     }
 
 

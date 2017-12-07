@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -37,10 +38,14 @@ public class MainActivity extends AppCompatActivity implements
 
     private int mPosition = RecyclerView.NO_POSITION;
     private static final String POSITION_KEY = "position_key";
+    private static final String SAVED_LAYOUT_MANAGER = "saved_layout_manager";
 
     private TextView mErrorMessageDisplay;
     private TextView mNoFavoritesDisplay;
     private ProgressBar mLoadingIndicator;
+
+    private Parcelable mLayoutManagerSavedState;
+
 
     private static final String[] MOVIE_LIST_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
@@ -61,13 +66,10 @@ public class MainActivity extends AppCompatActivity implements
     private static final int ID_MOVIE_LOADER = 100;
     private static final int ID_FAV_MOVIE_LOADER = 101;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            mPosition = savedInstanceState.getInt(POSITION_KEY);
-        }
 
         setContentView(R.layout.activity_main);
 
@@ -103,8 +105,17 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+//        outState.putInt(POSITION_KEY, mPosition);
+        outState.putParcelable(SAVED_LAYOUT_MANAGER,
+                mRecyclerView.getLayoutManager().onSaveInstanceState());
         super.onSaveInstanceState(outState);
-        outState.putInt(POSITION_KEY, mPosition);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        mLayoutManagerSavedState = savedInstanceState.getParcelable(SAVED_LAYOUT_MANAGER);
+
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
@@ -202,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
-
+        showLoading();
         switch (loaderId) {
             case ID_MOVIE_LOADER:
                 return new CursorLoader(this,
@@ -233,8 +244,11 @@ public class MainActivity extends AppCompatActivity implements
         if (null == data) throw new RuntimeException("No data returned from the loader");
         mMovieAdapter.swapCursor(data);
         mMovieAdapter.notifyDataSetChanged();
-        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
-        mRecyclerView.smoothScrollToPosition(mPosition);
+//        if (mLayoutManagerSavedState != null) {
+//            mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerSavedState);
+//        }
+//        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+//        mRecyclerView.smoothScrollToPosition(mPosition);
         if (data.getCount() != 0) {
             showMovieDataView();
         } else {

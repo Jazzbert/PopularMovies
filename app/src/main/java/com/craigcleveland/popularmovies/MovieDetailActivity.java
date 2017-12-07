@@ -254,7 +254,11 @@ public class MovieDetailActivity extends AppCompatActivity implements
                 // Set Poster
                 String posterUrl =
                         NetworkUtils.buildPosterURL(sPoster);
-                Picasso.with(this).load(posterUrl).into(mPosterImageView);
+                Picasso.with(this)
+                        .load(posterUrl)
+                        .placeholder(R.drawable.sample)
+                        .error(R.drawable.sample)
+                        .into(mPosterImageView);
 
                 // Format and set release date - lint suppressed because date from TMDB is explicit
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

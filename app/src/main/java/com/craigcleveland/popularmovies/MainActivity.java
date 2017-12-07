@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements
         return Integer.parseInt(sharedPreferences.getString(sort_key, sort_default));
     }
 
-    public void onClick(int movieID, int position) {
+    public void onClick(int movieID) {
         Class destinationClass = MovieDetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(this, destinationClass);
         Uri uriForMovieClicked = MovieContract.MovieEntry.buildMovieDetailUri(movieID, getSortType());

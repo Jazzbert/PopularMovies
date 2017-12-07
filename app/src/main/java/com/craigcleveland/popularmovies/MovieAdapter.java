@@ -22,7 +22,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     private Cursor mCursor;
 
     public interface MovieAdapterClickHandler {
-        void onClick(int movieID, int position);
+        void onClick(int movieID);
     }
 
     MovieAdapter(@NonNull Context context, MovieAdapterClickHandler clickHandler) {
@@ -46,8 +46,8 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-            mClickHandler.onClick(mCursor.getInt(MainActivity.INDEX_MOVIE_ID),
-                    adapterPosition);
+            mClickHandler.onClick(mCursor.getInt(MainActivity.INDEX_MOVIE_ID)
+            );
         }
     }
 
@@ -74,7 +74,11 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         String posterURL =
                 NetworkUtils.buildPosterURL(mCursor.getString(MainActivity.INDEX_MOVIE_POSTER));
         //Context context = movieAdapterViewHolder.mPosterImageView.getContext();
-        Picasso.with(mContext).load(posterURL).into(movieAdapterViewHolder.mPosterImageView);
+        Picasso.with(mContext)
+                .load(posterURL)
+                .placeholder(R.drawable.sample)
+                .error(R.drawable.sample)
+                .into(movieAdapterViewHolder.mPosterImageView);
 
     }
 
